@@ -19,7 +19,7 @@
 export default {
   data() {
     return {
-      title: "VuetifyでTODOリスト",
+      title: "メニューリスト",
       drawer: false,
       group: null,
     };
