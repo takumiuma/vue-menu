@@ -1,8 +1,8 @@
 <!-- ここがデフォルトのエントリーポイント -->
 <template>
-  <div>
+  <v-app>
     <NuxtLayout>
-      <NuxtPage />
+      <v-main><NuxtPage /></v-main>
     </NuxtLayout>
-  </div>
+  </v-app>
 </template>
