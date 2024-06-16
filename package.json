@@ -20,6 +20,12 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
-    "axios": "^1.6.5"
+    "@pinia-plugin-persistedstate/nuxt": "^1.2.0",
+    "@pinia/nuxt": "^0.5.1",
+    "@rollup/rollup-darwin-x64": "^4.12.0",
+    "axios": "^1.6.5",
+    "nuxt3-vuex-module": "^1.1.0",
+    "pinia": "^2.1.7",
+    "vite": "4.4.0"
   }
 }

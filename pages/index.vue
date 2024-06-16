@@ -1,82 +1,73 @@
 <template>
-  <v-container>
-    <loading
-      v-model:active="isLoading"
-      :can-cancel="true"
-      :on-cancel="onCancel"
-      :is-full-page="fullPage"
-    />
-    <v-row>
-      <v-col><v-btn @click="getMenu()">ランダム表示</v-btn></v-col>
-      <v-col>
-        <v-select v-model="count" label="何件" :items="[1, 2, 3, 4, 5]" variant="outlined">
-        </v-select>
-      </v-col>
-      <v-col>
-        <v-btn @click="getMenu(count)">ランダムに{{ count }}件表示</v-btn>
-      </v-col>
-      <v-col>
-        <v-btn color="primary" @click="dialog = true">条件を絞る</v-btn>
-      </v-col>
-    </v-row>
-    <div class="text-center">
-      <v-dialog v-model="dialog" width="auto">
-        <v-card>
-          <v-btn color="primary" block @click="menuFilter(genreIds, categoryIds)">適用</v-btn>
-          <v-row>
-            <v-col>
-              <v-data-table
-                v-model="genreIds"
-                :headers="genreHeader"
-                :items="genres"
-                show-select
-                hover
-              >
-                <!-- {{ item.id }}を消せばID表示は消える。 -->
-                <template #item.id="{ item }">{{ item.id }}</template>
-                <template #item.name="{ item }">{{ item.name }}</template>
-              </v-data-table>
-            </v-col>
-            <v-col>
-              <v-data-table
-                v-model="categoryIds"
-                :headers="categoryHeader"
-                :items="categories"
-                show-select
-                hover
-              >
-                <template #item.id="{ item }">{{ item.id }}</template>
-                <template #item.name="{ item }">{{ item.name }}</template>
-              </v-data-table>
-            </v-col>
-          </v-row>
-        </v-card>
-      </v-dialog>
-    </div>
-  </v-container>
-  <v-container>
-    <v-data-table :headers="headers" :items="displayedMenu" hover>
-      <template #item="{ item }">
-        <tr>
-          <td>{{ item.name }}</td>
-          <td>
-            <a :href="item.shopSearch" target="_blank">「{{ item.name }} お店 近く」で検索</a>
-          </td>
-          <td>
-            <a :href="item.recipeSearch" target="_blank">「{{ item.name }} レシピ」で検索</a>
-          </td>
-        </tr>
-      </template>
-    </v-data-table>
-  </v-container>
+  <div>
+    <loading v-model:active="isLoading" :enforce-focus="false" />
+    <v-container>
+      <v-row>
+        <v-col><v-btn block variant="outlined" color="primary" @click="randomGet()">全てのメニューをランダムに表示</v-btn></v-col>
+        <v-col>
+          <v-select v-model="count" label="何件" :items="[1, 2, 3, 4, 5]" variant="outlined"> </v-select>
+        </v-col>
+        <v-col>
+          <v-btn variant="outlined" color="primary" @click="randomGet(count)">ランダムに{{ count }}件表示</v-btn>
+        </v-col>
+        <v-col>
+          <v-btn color="primary" @click="dialog = true">条件を絞る</v-btn>
+        </v-col>
+      </v-row>
+      <div class="text-center">
+        <v-dialog v-model="dialog" width="auto">
+          <v-card>
+            <v-btn color="primary" block @click="menuFilter(genreIds, categoryIds)">適用</v-btn>
+            <v-row>
+              <v-col>
+                <v-data-table v-model="genreIds" :headers="genreHeader" :items="genres" show-select hover>
+                  <!-- {{ item.id }}を消せばID表示は消える。 -->
+                  <template #item.id="{ item }">{{ item.id }}</template>
+                  <template #item.name="{ item }">{{ item.name }}</template>
+                </v-data-table>
+              </v-col>
+              <v-col>
+                <v-data-table v-model="categoryIds" :headers="categoryHeader" :items="categories" show-select hover>
+                  <template #item.id="{ item }">{{ item.id }}</template>
+                  <template #item.name="{ item }">{{ item.name }}</template>
+                </v-data-table>
+              </v-col>
+            </v-row>
+          </v-card>
+        </v-dialog>
+      </div>
+    </v-container>
+    <v-container>
+      <v-data-table :headers="headers" :items="displayedMenu" hover>
+        <template #item="{ item }">
+          <tr>
+            <td>{{ item.name }}</td>
+            <td>
+              <a :href="item.shopSearch" target="_blank">{{ `「${item.name} お店 近く」で検索` }}</a>
+            </td>
+            <td>
+              <a :href="item.recipeSearch" target="_blank">{{ `「${item.name}のレシピ」を検索` }}</a>
+            </td>
+          </tr>
+        </template>
+      </v-data-table>
+    </v-container>
+  </div>
 </template>
-
 <script>
 import axios from 'axios';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 
 export default {
+  setup() {
+    const counter = useCounterStore();
+    const menuData1 = useMenuListStore();
+    return {
+      counter,
+      menuData1,
+    };
+  },
   components: {
     Loading,
   },
@@ -84,7 +75,7 @@ export default {
     return {
       isLoading: false,
       fullPage: true,
-      isHide: true,
+      menuData: [],
       menuList: [],
       displayedMenu: [],
       filteredMenu: null,
@@ -119,75 +110,70 @@ export default {
       ],
       headers: [
         { title: 'メニュー', value: 'menu_name' },
-        { title: '近くのお店を検索', value: 'menu_name' },
-        { title: 'レシピを検索', value: 'menu_name' },
+        { title: 'Googleで近くのお店を検索', value: 'menu_name' },
+        { title: 'クックパッドでレシピを検索', value: 'menu_name' },
       ],
       dialog: false,
     };
   },
-  computed: {},
-  watch: {},
-  mounted() {},
   created() {
-    // this.isLoading = true;
-    this.initialize();
-    // this.isLoading = false;
+    // TODO:いい感じにローディングかかってない
+    this.isLoading = true;
+    this.initialize().then(() => {
+      this.isLoading = false;
+    });
   },
   methods: {
-    initialize() {
-      axios
+    async initialize() {
+      await axios
         .get('http://localhost:8080/rest')
-        .then((response) =>
-          response.data.forEach((menu) =>
-            this.menuList.push({
-              id: menu.menu_id,
-              name: menu.menu_name,
-              shopSearch: `https://www.google.com/search?q=${menu.menu_name} お店 近く`,
-              recipeSearch: `https://www.google.com/search?q=${menu.menu_name} レシピ`,
-              genreId: menu.eating_genre_id,
-              categoryId: menu.eating_category_id,
-            })
-          )((this.displayedMenu = this.menuList))
-        )
+        .then((response) => (this.menuData = response.data))
         .catch((error) => console.log(error));
+      this.menuData.forEach((menu) =>
+        this.menuList.push({
+          id: menu.menu_id,
+          name: menu.menu_name,
+          shopSearch: `https://www.google.com/search?q=${menu.menu_name} お店 近く`,
+          recipeSearch: `https://cookpad.com/search/${menu.menu_name}`,
+          genreId: menu.eating_genre_id,
+          categoryId: menu.eating_category_id,
+        })
+      );
+      this.displayedMenu = this.menuList;
     },
-    getMenu(count) {
+    randomGet(count) {
       // 条件絞り込みダイアログ使用しているかチェック
       if (this.filteredMenu) {
         let idArray = this.filteredMenu.map((menu) => menu.id);
         idArray = this.shuffleArray(idArray);
-        this.randamGet(idArray);
+        this.getMenuList(idArray);
       } else {
         let idArray = this.menuList.map((menu) => menu.id);
         idArray = this.shuffleArray(idArray);
-        this.randamGet(idArray);
+        this.getMenuList(idArray);
       }
+      // 指定した件数以降は切り捨て
       if (count) {
         this.displayedMenu = this.displayedMenu.slice(0, count);
       }
     },
-    randamGet(idArray) {
+    getMenuList(idArray) {
       this.displayedMenu = idArray.map((id) => {
         return this.menuList.find((menu) => menu.id === id);
       });
     },
-    // 引数の数値配列をシャッフルする
-    shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
+    // 数値配列をシャッフルして返す
+    shuffleArray(nums) {
+      for (let i = nums.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+        [nums[i], nums[j]] = [nums[j], nums[i]];
       }
-      return array;
+      return nums;
     },
     menuFilter(genreIds, categoryIds) {
-      this.filteredMenu = this.menuList.filter(
-        (menu) => genreIds.includes(menu.genreId) && categoryIds.includes(menu.categoryId)
-      );
+      this.filteredMenu = this.menuList.filter((menu) => genreIds.includes(menu.genreId) && categoryIds.includes(menu.categoryId));
       this.displayedMenu = this.filteredMenu;
       this.dialog = false;
-    },
-    onCancel() {
-      console.log('User cancelled the loader.');
     },
   },
 };

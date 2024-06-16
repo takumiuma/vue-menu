@@ -1,4 +1,3 @@
-<!-- ここがデフォルトのエントリーポイント -->
 <template>
   <v-app>
     <NuxtLayout>
