@@ -2,16 +2,13 @@
   <div>
     <loading v-model:active="isLoading" :enforce-focus="false" />
     <v-container>
-      <!-- <nuxt-link to="/count">count ページへ飛ぶ </nuxt-link> //countページに遷移する
-      <p>ボタンを{{ counter.count }}回おしました!</p> -->
       <v-row>
-        <v-col><v-btn @click="randomGet()">ランダム表示</v-btn></v-col>
+        <v-col><v-btn block variant="outlined" color="primary" @click="randomGet()">全てのメニューをランダムに表示</v-btn></v-col>
         <v-col>
-          <v-select v-model="count" label="何件" :items="[1, 2, 3, 4, 5]" variant="outlined">
-          </v-select>
+          <v-select v-model="count" label="何件" :items="[1, 2, 3, 4, 5]" variant="outlined"> </v-select>
         </v-col>
         <v-col>
-          <v-btn @click="randomGet(count)">ランダムに{{ count }}件表示</v-btn>
+          <v-btn variant="outlined" color="primary" @click="randomGet(count)">ランダムに{{ count }}件表示</v-btn>
         </v-col>
         <v-col>
           <v-btn color="primary" @click="dialog = true">条件を絞る</v-btn>
@@ -23,26 +20,14 @@
             <v-btn color="primary" block @click="menuFilter(genreIds, categoryIds)">適用</v-btn>
             <v-row>
               <v-col>
-                <v-data-table
-                  v-model="genreIds"
-                  :headers="genreHeader"
-                  :items="genres"
-                  show-select
-                  hover
-                >
+                <v-data-table v-model="genreIds" :headers="genreHeader" :items="genres" show-select hover>
                   <!-- {{ item.id }}を消せばID表示は消える。 -->
                   <template #item.id="{ item }">{{ item.id }}</template>
                   <template #item.name="{ item }">{{ item.name }}</template>
                 </v-data-table>
               </v-col>
               <v-col>
-                <v-data-table
-                  v-model="categoryIds"
-                  :headers="categoryHeader"
-                  :items="categories"
-                  show-select
-                  hover
-                >
+                <v-data-table v-model="categoryIds" :headers="categoryHeader" :items="categories" show-select hover>
                   <template #item.id="{ item }">{{ item.id }}</template>
                   <template #item.name="{ item }">{{ item.name }}</template>
                 </v-data-table>
@@ -58,16 +43,15 @@
           <tr>
             <td>{{ item.name }}</td>
             <td>
-              <a :href="item.shopSearch" target="_blank">「{{ item.name }} お店 近く」で検索</a>
+              <a :href="item.shopSearch" target="_blank">{{ `「${item.name} お店 近く」で検索` }}</a>
             </td>
             <td>
-              <a :href="item.recipeSearch" target="_blank">「{{ item.name }} レシピ」で検索</a>
+              <a :href="item.recipeSearch" target="_blank">{{ `「${item.name}のレシピ」を検索` }}</a>
             </td>
           </tr>
         </template>
       </v-data-table>
     </v-container>
-    <v-btn @click="check()">チェック</v-btn>
   </div>
 </template>
 <script>
@@ -126,19 +110,13 @@ export default {
       ],
       headers: [
         { title: 'メニュー', value: 'menu_name' },
-        { title: '近くのお店を検索', value: 'menu_name' },
-        { title: 'レシピを検索', value: 'menu_name' },
+        { title: 'Googleで近くのお店を検索', value: 'menu_name' },
+        { title: 'クックパッドでレシピを検索', value: 'menu_name' },
       ],
       dialog: false,
     };
   },
-  computed: {
-    // ...mapState('counter', [useCounterStore]),
-    // ...mapStores(useCounterStore),
-  },
-  watch: {},
-  mounted() {},
-  async created() {
+  created() {
     // TODO:いい感じにローディングかかってない
     this.isLoading = true;
     this.initialize().then(() => {
@@ -146,12 +124,6 @@ export default {
     });
   },
   methods: {
-    check() {
-      console.log('counter', this.counter);
-      // console.log('counter.count', this.counter.count);
-      // this.counter.increment();
-      console.log(this.menuData1);
-    },
     async initialize() {
       await axios
         .get('http://localhost:8080/rest')
@@ -162,7 +134,7 @@ export default {
           id: menu.menu_id,
           name: menu.menu_name,
           shopSearch: `https://www.google.com/search?q=${menu.menu_name} お店 近く`,
-          recipeSearch: `https://www.google.com/search?q=${menu.menu_name} レシピ`,
+          recipeSearch: `https://cookpad.com/search/${menu.menu_name}`,
           genreId: menu.eating_genre_id,
           categoryId: menu.eating_category_id,
         })
@@ -199,9 +171,7 @@ export default {
       return nums;
     },
     menuFilter(genreIds, categoryIds) {
-      this.filteredMenu = this.menuList.filter(
-        (menu) => genreIds.includes(menu.genreId) && categoryIds.includes(menu.categoryId)
-      );
+      this.filteredMenu = this.menuList.filter((menu) => genreIds.includes(menu.genreId) && categoryIds.includes(menu.categoryId));
       this.displayedMenu = this.filteredMenu;
       this.dialog = false;
     },
