@@ -3,12 +3,12 @@
     <loading v-model:active="isLoading" :enforce-focus="false" />
     <v-container>
       <v-row>
-        <v-col><v-btn block variant="outlined" color="primary" @click="randomGet()">全てのメニューをランダムに表示</v-btn></v-col>
+        <v-col><v-btn block variant="outlined" color="primary" @click="displayRandomMenus()">全てのメニューをランダムに表示</v-btn></v-col>
         <v-col>
           <v-select v-model="count" label="何件" :items="[1, 2, 3, 4, 5]" variant="outlined"> </v-select>
         </v-col>
         <v-col>
-          <v-btn variant="outlined" color="primary" @click="randomGet(count)">ランダムに{{ count }}件表示</v-btn>
+          <v-btn variant="outlined" color="primary" @click="displayRandomMenus(count)">ランダムに{{ count }}件表示</v-btn>
         </v-col>
         <v-col>
           <v-btn color="primary" @click="dialog = true">条件を絞る</v-btn>
@@ -17,7 +17,7 @@
       <div class="text-center">
         <v-dialog v-model="dialog" width="auto">
           <v-card>
-            <v-btn color="primary" block @click="menuFilter(genreIds, categoryIds)">適用</v-btn>
+            <v-btn color="primary" block @click="filterMenus(genreIds, categoryIds)">適用</v-btn>
             <v-row>
               <v-col>
                 <v-data-table v-model="genreIds" :headers="genreHeader" :items="genres" show-select hover>
@@ -55,17 +55,15 @@
   </div>
 </template>
 <script>
-import axios from 'axios';
+import { useMenuStore } from '~/composables/menu';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 
 export default {
   setup() {
-    const counter = useCounterStore();
-    const menuData1 = useMenuListStore();
+    const menuStore = useMenuStore();
     return {
-      counter,
-      menuData1,
+      menuStore,
     };
   },
   components: {
@@ -78,7 +76,7 @@ export default {
       menuData: [],
       menuList: [],
       displayedMenu: [],
-      filteredMenu: null,
+      filteredMenu: [],
       count: 3,
       genreIds: [1, 2, 3, 4, 5, 6],
       categoryIds: [1, 2, 3, 4, 5, 6, 7, 8],
@@ -109,68 +107,83 @@ export default {
         { title: 'カテゴリー', value: 'name' },
       ],
       headers: [
-        { title: 'メニュー', value: 'menu_name' },
-        { title: 'Googleで近くのお店を検索', value: 'menu_name' },
-        { title: 'クックパッドでレシピを検索', value: 'menu_name' },
+        { title: 'メニュー', value: 'name' },
+        { title: 'Googleで近くのお店を検索', value: 'shopSearch' },
+        { title: 'クックパッドでレシピを検索', value: 'recipeSearch' },
       ],
       dialog: false,
     };
   },
   created() {
-    // TODO:いい感じにローディングかかってない
     this.isLoading = true;
-    this.initialize().then(() => {
+    this.getMenuList().then(() => {
       this.isLoading = false;
     });
   },
   methods: {
-    async initialize() {
-      await axios
-        .get('http://localhost:8080/rest')
-        .then((response) => (this.menuData = response.data))
-        .catch((error) => console.log(error));
-      this.menuData.forEach((menu) =>
-        this.menuList.push({
-          id: menu.menu_id,
-          name: menu.menu_name,
-          shopSearch: `https://www.google.com/search?q=${menu.menu_name} お店 近く`,
-          recipeSearch: `https://cookpad.com/search/${menu.menu_name}`,
-          genreId: menu.eating_genre_id,
-          categoryId: menu.eating_category_id,
-        })
-      );
+    /**
+     * Piniaのstoreからメニューデータを取得し、メニューリストデータを整形して表示用にコピーします。
+     * @async
+     * @returns {Promise<void>}
+     */
+    async getMenuList() {
+      // piniaのstoreからメニューデータを取得
+      const menuData = await this.menuStore.getMenus();
+      // メニューリストデータを整形
+      this.menuList = menuData.map((menu) => ({
+        id: menu.menuId,
+        name: menu.menuName,
+        shopSearch: `https://www.google.com/search?q=${menu.menuName} お店 近く`,
+        recipeSearch: `https://cookpad.com/search/${menu.menuName}`,
+        genreId: menu.eatingGenreId,
+        categoryId: menu.eatingCategoryId,
+      }));
+      // メニューリストを表示用にコピー。元データは保持。
       this.displayedMenu = this.menuList;
     },
-    randomGet(count) {
-      // 条件絞り込みダイアログ使用しているかチェック
-      if (this.filteredMenu) {
-        let idArray = this.filteredMenu.map((menu) => menu.id);
-        idArray = this.shuffleArray(idArray);
-        this.getMenuList(idArray);
-      } else {
-        let idArray = this.menuList.map((menu) => menu.id);
-        idArray = this.shuffleArray(idArray);
-        this.getMenuList(idArray);
-      }
-      // 指定した件数以降は切り捨て
-      if (count) {
-        this.displayedMenu = this.displayedMenu.slice(0, count);
-      }
+
+    /**
+     * ランダムにメニューを表示します。条件絞り込み後のメニューがあればそれを使用します。
+     * @param {number} [count] - 表示するメニューの数。指定がない場合は全て表示します。
+     */
+    displayRandomMenus(count) {
+      // 条件絞り込み後のメニューがあればそれを使う
+      const menuIds = this.filteredMenu.length !== 0 ? this.filteredMenu.map((menu) => menu.id) : this.menuList.map((menu) => menu.id);
+      const shuffledMenuIds = this.shuffleArrayElements(menuIds);
+      const randomMenus = this.findMenusByIds(shuffledMenuIds);
+      // countが指定されていればその数だけ表示
+      this.displayedMenu = count ? randomMenus.slice(0, count) : randomMenus;
     },
-    getMenuList(idArray) {
-      this.displayedMenu = idArray.map((id) => {
-        return this.menuList.find((menu) => menu.id === id);
-      });
+
+    /**
+     * 指定されたIDのメニューを検索して返します。
+     * @param {number[]} ids - メニューのIDの配列。
+     * @returns {Object[]} - 指定されたIDのメニューの配列。
+     */
+    findMenusByIds(ids) {
+      return ids.map((id) => this.menuList.find((menu) => menu.id === id));
     },
-    // 数値配列をシャッフルして返す
-    shuffleArray(nums) {
+
+    /**
+     * 数値配列をシャッフルして返します。
+     * @param {number[]} nums - シャッフルする数値配列。
+     * @returns {number[]} - シャッフルされた数値配列。
+     */
+    shuffleArrayElements(nums) {
+      // Fisher-Yatesアルゴリズム
       for (let i = nums.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [nums[i], nums[j]] = [nums[j], nums[i]];
       }
       return nums;
     },
-    menuFilter(genreIds, categoryIds) {
+
+    /**
+     * 指定されたジャンルIDとカテゴリIDに基づいてメニューをフィルタリングします。
+     * @param {number[]} genreIds - フィルタリングするジャンルのIDの配列。
+     * @param {number[]} categoryIds - フィルタリングするカテゴリのIDの配列。
+     */
+    filterMenus(genreIds, categoryIds) {
       this.filteredMenu = this.menuList.filter((menu) => genreIds.includes(menu.genreId) && categoryIds.includes(menu.categoryId));
       this.displayedMenu = this.filteredMenu;
       this.dialog = false;
