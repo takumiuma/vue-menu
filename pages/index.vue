@@ -48,6 +48,12 @@
             <td>
               <a :href="item.recipeSearch" target="_blank">{{ `「${item.name}のレシピ」を検索` }}</a>
             </td>
+            <td>
+              <v-chip>{{ genres.find((genre) => genre.id === item.genreId).name }}</v-chip>
+            </td>
+            <td>
+              <v-chip>{{ categories.find((category) => category.id === item.categoryId).name }}</v-chip>
+            </td>
           </tr>
         </template>
       </v-data-table>
@@ -55,7 +61,7 @@
   </div>
 </template>
 <script>
-import { useMenuStore } from '~/composables/menu';
+import { useMenuStore } from '~/store/menu';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 
@@ -110,6 +116,8 @@ export default {
         { title: 'メニュー', value: 'name' },
         { title: 'Googleで近くのお店を検索', value: 'shopSearch' },
         { title: 'クックパッドでレシピを検索', value: 'recipeSearch' },
+        { title: 'ジャンル', value: 'genreId' },
+        { title: 'カテゴリ', value: 'categoryId' },
       ],
       dialog: false,
     };
