@@ -39,6 +39,16 @@
     </v-container>
     <v-container>
       <v-data-table :headers="headers" :items="displayedMenu" hover>
+        <template #top>
+          <v-toolbar>
+            <v-toolbar-title>Expandable Table</v-toolbar-title>
+            <v-chip v-for="genreId in genreIds">{{ genres.find((genre) => genre.id === genreId).name }}</v-chip>
+          </v-toolbar>
+          <v-toolbar>
+            <v-toolbar-title>Expandable Table</v-toolbar-title>
+            <v-chip v-for="categoryId in categoryIds">{{ categories.find((category) => category.id === categoryId).name }}</v-chip>
+          </v-toolbar>
+        </template>
         <template #item="{ item }">
           <tr>
             <td>{{ item.name }}</td>
@@ -49,10 +59,10 @@
               <a :href="item.recipeSearch" target="_blank">{{ `「${item.name}のレシピ」を検索` }}</a>
             </td>
             <td>
-              <v-chip>{{ genres.find((genre) => genre.id === item.genreId).name }}</v-chip>
+              <v-chip v-for="genreId in item.genreIds">{{ genres.find((genre) => genre.id === genreId).name }}</v-chip>
             </td>
             <td>
-              <v-chip>{{ categories.find((category) => category.id === item.categoryId).name }}</v-chip>
+              <v-chip v-for="categoryId in item.categoryIds">{{ categories.find((category) => category.id === categoryId).name }}</v-chip>
             </td>
           </tr>
         </template>
@@ -116,8 +126,8 @@ export default {
         { title: 'メニュー', value: 'name' },
         { title: 'Googleで近くのお店を検索', value: 'shopSearch' },
         { title: 'クックパッドでレシピを検索', value: 'recipeSearch' },
-        { title: 'ジャンル', value: 'genreId' },
-        { title: 'カテゴリ', value: 'categoryId' },
+        { title: 'ジャンル', value: 'genreIds' },
+        { title: 'カテゴリ', value: 'categoryIds' },
       ],
       dialog: false,
     };
@@ -143,8 +153,8 @@ export default {
         name: menu.menuName,
         shopSearch: `https://www.google.com/search?q=${menu.menuName} お店 近く`,
         recipeSearch: `https://cookpad.com/search/${menu.menuName}`,
-        genreId: menu.eatingGenreId,
-        categoryId: menu.eatingCategoryId,
+        genreIds: menu.genreIds,
+        categoryIds: menu.categoryIds,
       }));
       // メニューリストを表示用にコピー。元データは保持。
       this.displayedMenu = this.menuList;

@@ -30,8 +30,8 @@ axios.interceptors.response.use(
 interface menu {
   menuId: number;
   menuName: string;
-  eatingGenreId: number;
-  eatingCategoryId: number;
+  genreIds: number[];
+  categoryIds: number[];
 }
 
 export const useMenuStore = defineStore('menu', () => {

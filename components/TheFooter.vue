@@ -1,6 +1,5 @@
 <template>
-    <div>
-        フッター
-    </div>
+  <div>
+    <!-- フッター -->
+  </div>
 </template>
-  
