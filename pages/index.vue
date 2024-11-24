@@ -10,38 +10,13 @@
         <v-col>
           <v-btn variant="outlined" color="primary" @click="displayRandomMenus(count)">ランダムに{{ count }}件表示</v-btn>
         </v-col>
-        <v-col>
-          <v-btn color="primary" @click="dialog = true">条件を絞る</v-btn>
-        </v-col>
       </v-row>
-      <div class="text-center">
-        <v-dialog v-model="dialog" width="auto">
-          <v-card>
-            <v-btn color="primary" block @click="filterMenus(genreIds, categoryIds)">適用</v-btn>
-            <v-row>
-              <v-col>
-                <v-data-table v-model="genreIds" :headers="genreHeader" :items="GENRES" show-select hover>
-                  <!-- {{ item.id }}を消せばID表示は消える。 -->
-                  <template #item.id="{ item }">{{ item.id }}</template>
-                  <template #item.name="{ item }">{{ item.name }}</template>
-                </v-data-table>
-              </v-col>
-              <v-col>
-                <v-data-table v-model="categoryIds" :headers="categoryHeader" :items="CATEGORIES" show-select hover>
-                  <template #item.id="{ item }">{{ item.id }}</template>
-                  <template #item.name="{ item }">{{ item.name }}</template>
-                </v-data-table>
-              </v-col>
-            </v-row>
-          </v-card>
-        </v-dialog>
-      </div>
     </v-container>
     <v-container>
       <v-data-table :headers="headers" :items="displayedMenu" hover>
         <template #top>
-          <v-combobox v-model="selectedGenreNames" :items="GENRES.map((genre) => genre.name)" label="選択中のジャンル" chips multiple></v-combobox>
-          <v-combobox v-model="selectedCategoryNames" :items="CATEGORIES.map((category) => category.name)" label="選択中のカテゴリ" chips multiple></v-combobox>
+          <v-combobox v-model="selectedGenreNames" :items="GENRES.map((genre) => genre.name)" label="選択中のジャンル" chips multiple closable-chips></v-combobox>
+          <v-combobox v-model="selectedCategoryNames" :items="CATEGORIES.map((category) => category.name)" label="選択中のカテゴリ" chips multiple closable-chips></v-combobox>
         </template>
         <template #item="{ item }">
           <tr>
@@ -62,6 +37,11 @@
         </template>
       </v-data-table>
     </v-container>
+    <v-dialog v-model="dialog" width="auto">
+      <v-card>
+        <!-- 各メニューのタグ付け替えダイアログ作成予定 -->
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 <script>
@@ -72,7 +52,6 @@ import 'vue-loading-overlay/dist/css/index.css';
 export default {
   setup() {
     const menuStore = useMenuStore();
-    // TODO: リファクタ時にフラグだけリアクティブにするよう変更
     const GENRES = [
       { id: 1, name: '和食' },
       { id: 2, name: '中華料理' },
@@ -113,16 +92,6 @@ export default {
       displayedMenu: [],
       filteredMenu: [],
       count: 3,
-      genreIds: [1, 2, 3, 4, 5, 6],
-      categoryIds: [1, 2, 3, 4, 5, 6, 7, 8],
-      genreHeader: [
-        { title: 'ID', value: 'id' },
-        { title: 'ジャンル', value: 'name' },
-      ],
-      categoryHeader: [
-        { title: 'ID', value: 'id' },
-        { title: 'カテゴリー', value: 'name' },
-      ],
       headers: [
         { title: 'メニュー', value: 'name' },
         { title: 'Googleで近くのお店を検索', value: 'shopSearch' },
@@ -135,10 +104,10 @@ export default {
   },
   watch: {
     selectedGenreNames() {
-      this.filteredMenus2();
+      this.filteredMenus();
     },
     selectedCategoryNames() {
-      this.filteredMenus2();
+      this.filteredMenus();
     },
   },
   computed: {},
@@ -149,12 +118,6 @@ export default {
     });
   },
   methods: {
-    filteredMenus2() {
-      const selectedGenreIds = this.GENRES.filter((genre) => this.selectedGenreNames.includes(genre.name)).map((genre) => genre.id);
-      const selectedCategoryIds = this.CATEGORIES.filter((category) => this.selectedCategoryNames.includes(category.name)).map((category) => category.id);
-      this.filteredMenu = this.menuList.filter((menu) => menu.genreIds.every((id) => selectedGenreIds.includes(id)) && menu.categoryIds.every((id) => selectedCategoryIds.includes(id)));
-      this.displayedMenu = this.filteredMenu;
-    },
     /**
      * Piniaのstoreからメニューデータを取得し、メニューリストデータを整形して表示用にコピーします。
      * @async
@@ -211,16 +174,26 @@ export default {
       }
       return nums;
     },
-
     /**
-     * 指定されたジャンルIDとカテゴリIDに基づいてメニューをフィルタリングします。
-     * @param {number[]} genreIds - フィルタリングするジャンルのIDの配列。
-     * @param {number[]} categoryIds - フィルタリングするカテゴリのIDの配列。
+     * 選択されたジャンル名とカテゴリ名に基づいてメニューをフィルタリングします。
+     *
+     * 1. 選択されたジャンル名に対応するジャンルIDを取得します。
+     * 2. 選択されたカテゴリ名に対応するカテゴリIDを取得します。
+     * 3. メニューをフィルタリングし、条件を満たすメニューを `filteredMenu` に格納します。
+     * 4. フィルタリングされたメニューを表示用に `displayedMenu` に設定します。
      */
-    filterMenus(genreIds, categoryIds) {
-      this.filteredMenu = this.menuList.filter((menu) => genreIds.includes(menu.genreId) && categoryIds.includes(menu.categoryId));
+    filteredMenus() {
+      // 選択されたジャンル名に対応するジャンルIDを取得
+      const selectedGenreIds = this.GENRES.filter((genre) => this.selectedGenreNames.includes(genre.name)).map((genre) => genre.id);
+
+      // 選択されたカテゴリ名に対応するカテゴリIDを取得
+      const selectedCategoryIds = this.CATEGORIES.filter((category) => this.selectedCategoryNames.includes(category.name)).map((category) => category.id);
+
+      // メニューをフィルタリング
+      this.filteredMenu = this.menuList.filter((menu) => menu.genreIds.every((id) => selectedGenreIds.includes(id)) && menu.categoryIds.every((id) => selectedCategoryIds.includes(id)));
+
+      // フィルタリングされたメニューを表示用に設定
       this.displayedMenu = this.filteredMenu;
-      this.dialog = false;
     },
   },
 };
