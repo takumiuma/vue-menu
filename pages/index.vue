@@ -20,14 +20,14 @@
             <v-btn color="primary" block @click="filterMenus(genreIds, categoryIds)">適用</v-btn>
             <v-row>
               <v-col>
-                <v-data-table v-model="genreIds" :headers="genreHeader" :items="genres" show-select hover>
+                <v-data-table v-model="genreIds" :headers="genreHeader" :items="GENRES" show-select hover>
                   <!-- {{ item.id }}を消せばID表示は消える。 -->
                   <template #item.id="{ item }">{{ item.id }}</template>
                   <template #item.name="{ item }">{{ item.name }}</template>
                 </v-data-table>
               </v-col>
               <v-col>
-                <v-data-table v-model="categoryIds" :headers="categoryHeader" :items="categories" show-select hover>
+                <v-data-table v-model="categoryIds" :headers="categoryHeader" :items="CATEGORIES" show-select hover>
                   <template #item.id="{ item }">{{ item.id }}</template>
                   <template #item.name="{ item }">{{ item.name }}</template>
                 </v-data-table>
@@ -40,14 +40,8 @@
     <v-container>
       <v-data-table :headers="headers" :items="displayedMenu" hover>
         <template #top>
-          <v-toolbar>
-            <v-toolbar-title>Expandable Table</v-toolbar-title>
-            <v-chip v-for="genreId in genreIds">{{ genres.find((genre) => genre.id === genreId).name }}</v-chip>
-          </v-toolbar>
-          <v-toolbar>
-            <v-toolbar-title>Expandable Table</v-toolbar-title>
-            <v-chip v-for="categoryId in categoryIds">{{ categories.find((category) => category.id === categoryId).name }}</v-chip>
-          </v-toolbar>
+          <v-combobox v-model="selectedGenreNames" :items="GENRES.map((genre) => genre.name)" label="選択中のジャンル" chips multiple></v-combobox>
+          <v-combobox v-model="selectedCategoryNames" :items="CATEGORIES.map((category) => category.name)" label="選択中のカテゴリ" chips multiple></v-combobox>
         </template>
         <template #item="{ item }">
           <tr>
@@ -59,10 +53,10 @@
               <a :href="item.recipeSearch" target="_blank">{{ `「${item.name}のレシピ」を検索` }}</a>
             </td>
             <td>
-              <v-chip v-for="genreId in item.genreIds">{{ genres.find((genre) => genre.id === genreId).name }}</v-chip>
+              <v-chip v-for="genreId in item.genreIds">{{ GENRES.find((genre) => genre.id === genreId).name }}</v-chip>
             </td>
             <td>
-              <v-chip v-for="categoryId in item.categoryIds">{{ categories.find((category) => category.id === categoryId).name }}</v-chip>
+              <v-chip v-for="categoryId in item.categoryIds">{{ CATEGORIES.find((category) => category.id === categoryId).name }}</v-chip>
             </td>
           </tr>
         </template>
@@ -78,8 +72,33 @@ import 'vue-loading-overlay/dist/css/index.css';
 export default {
   setup() {
     const menuStore = useMenuStore();
+    // TODO: リファクタ時にフラグだけリアクティブにするよう変更
+    const GENRES = [
+      { id: 1, name: '和食' },
+      { id: 2, name: '中華料理' },
+      { id: 3, name: '洋食' },
+      { id: 4, name: '韓国料理' },
+      { id: 5, name: 'ファーストフード' },
+      { id: 6, name: 'その他' },
+    ];
+    const CATEGORIES = [
+      { id: 1, name: '肉' },
+      { id: 2, name: '魚' },
+      { id: 3, name: '野菜' },
+      { id: 4, name: 'ご飯もの' },
+      { id: 5, name: '麺類' },
+      { id: 6, name: 'パン' },
+      { id: 7, name: 'スープ・汁物' },
+      { id: 8, name: 'その他' },
+    ];
+    const selectedGenreNames = ref(GENRES.map((genre) => genre.name));
+    const selectedCategoryNames = ref(CATEGORIES.map((category) => category.name));
     return {
       menuStore,
+      GENRES,
+      CATEGORIES,
+      selectedGenreNames,
+      selectedCategoryNames,
     };
   },
   components: {
@@ -96,24 +115,6 @@ export default {
       count: 3,
       genreIds: [1, 2, 3, 4, 5, 6],
       categoryIds: [1, 2, 3, 4, 5, 6, 7, 8],
-      genres: [
-        { id: 1, name: '和食' },
-        { id: 2, name: '中華料理' },
-        { id: 3, name: '洋食' },
-        { id: 4, name: '韓国料理' },
-        { id: 5, name: 'ファーストフード' },
-        { id: 6, name: 'その他' },
-      ],
-      categories: [
-        { id: 1, name: '肉' },
-        { id: 2, name: '魚' },
-        { id: 3, name: '野菜' },
-        { id: 4, name: 'ご飯もの' },
-        { id: 5, name: '麺類' },
-        { id: 6, name: 'パン' },
-        { id: 7, name: 'スープ・汁物' },
-        { id: 8, name: 'その他' },
-      ],
       genreHeader: [
         { title: 'ID', value: 'id' },
         { title: 'ジャンル', value: 'name' },
@@ -132,6 +133,15 @@ export default {
       dialog: false,
     };
   },
+  watch: {
+    selectedGenreNames() {
+      this.filteredMenus2();
+    },
+    selectedCategoryNames() {
+      this.filteredMenus2();
+    },
+  },
+  computed: {},
   created() {
     this.isLoading = true;
     this.getMenuList().then(() => {
@@ -139,6 +149,12 @@ export default {
     });
   },
   methods: {
+    filteredMenus2() {
+      const selectedGenreIds = this.GENRES.filter((genre) => this.selectedGenreNames.includes(genre.name)).map((genre) => genre.id);
+      const selectedCategoryIds = this.CATEGORIES.filter((category) => this.selectedCategoryNames.includes(category.name)).map((category) => category.id);
+      this.filteredMenu = this.menuList.filter((menu) => menu.genreIds.every((id) => selectedGenreIds.includes(id)) && menu.categoryIds.every((id) => selectedCategoryIds.includes(id)));
+      this.displayedMenu = this.filteredMenu;
+    },
     /**
      * Piniaのstoreからメニューデータを取得し、メニューリストデータを整形して表示用にコピーします。
      * @async
