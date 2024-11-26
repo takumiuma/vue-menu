@@ -1,6 +1,8 @@
 <template>
   <div>
-    <loading v-model:active="isLoading" :enforce-focus="false" />
+    <v-overlay v-model="overlay" class="align-center justify-center">
+      <v-progress-circular size="64" indeterminate />
+    </v-overlay>
     <v-container>
       <v-row>
         <v-col><v-btn block variant="outlined" color="primary" @click="displayRandomMenus()">全てのメニューをランダムに表示</v-btn></v-col>
@@ -18,22 +20,17 @@
           <v-combobox v-model="selectedGenreNames" :items="GENRES.map((genre) => genre.name)" label="選択中のジャンル" chips multiple closable-chips></v-combobox>
           <v-combobox v-model="selectedCategoryNames" :items="CATEGORIES.map((category) => category.name)" label="選択中のカテゴリ" chips multiple closable-chips></v-combobox>
         </template>
-        <template #item="{ item }">
-          <tr>
-            <td>{{ item.name }}</td>
-            <td>
-              <a :href="item.shopSearch" target="_blank">{{ `「${item.name} お店 近く」で検索` }}</a>
-            </td>
-            <td>
-              <a :href="item.recipeSearch" target="_blank">{{ `「${item.name}のレシピ」を検索` }}</a>
-            </td>
-            <td>
-              <v-chip v-for="genreId in item.genreIds">{{ GENRES.find((genre) => genre.id === genreId).name }}</v-chip>
-            </td>
-            <td>
-              <v-chip v-for="categoryId in item.categoryIds">{{ CATEGORIES.find((category) => category.id === categoryId).name }}</v-chip>
-            </td>
-          </tr>
+        <template #item.shopSearch="{ item }">
+          <a :href="item.shopSearch" target="_blank">{{ `「${item.name} お店 近く」で検索` }}</a>
+        </template>
+        <template #item.recipeSearch="{ item }">
+          <a :href="item.recipeSearch" target="_blank">{{ `「${item.name}のレシピ」を検索` }}</a>
+        </template>
+        <template #item.genreIds="{ item }">
+          <v-chip v-for="genreId in item.genreIds">{{ GENRES.find((genre) => genre.id === genreId).name }}</v-chip>
+        </template>
+        <template #item.categoryIds="{ item }">
+          <v-chip v-for="categoryId in item.categoryIds">{{ CATEGORIES.find((category) => category.id === categoryId).name }}</v-chip>
         </template>
       </v-data-table>
     </v-container>
@@ -46,8 +43,6 @@
 </template>
 <script>
 import { useMenuStore } from '~/store/menu';
-import Loading from 'vue-loading-overlay';
-import 'vue-loading-overlay/dist/css/index.css';
 
 export default {
   setup() {
@@ -80,14 +75,9 @@ export default {
       selectedCategoryNames,
     };
   },
-  components: {
-    Loading,
-  },
   data() {
     return {
-      isLoading: false,
-      fullPage: true,
-      menuData: [],
+      overlay: false,
       menuList: [],
       displayedMenu: [],
       filteredMenu: [],
@@ -112,9 +102,9 @@ export default {
   },
   computed: {},
   created() {
-    this.isLoading = true;
+    this.overlay = true;
     this.getMenuList().then(() => {
-      this.isLoading = false;
+      this.overlay = false;
     });
   },
   methods: {
