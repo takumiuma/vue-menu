@@ -16,7 +16,46 @@ const toCamelCase = (obj: any): any => {
   return obj;
 };
 
+/**
+ * キャメルケースをスネークケースに変換する関数
+ * @param {string} str - 変換するキャメルケースの文字列
+ * @returns {string} - スネークケースに変換された文字列
+ */
+const toSnakeCase = (str: string): string => {
+  return str.replace(/([A-Z])/g, '_$1').toLowerCase();
+};
+
+/**
+ * オブジェクトのキーをキャメルケースからスネークケースに変換する関数
+ * @param {any} obj - 変換するオブジェクト
+ * @returns {any} - キーがスネークケースに変換されたオブジェクト
+ */
+const convertKeysToSnakeCase = (obj: any): any => {
+  if (Array.isArray(obj)) {
+    return obj.map((v) => convertKeysToSnakeCase(v));
+  } else if (obj !== null && obj.constructor === Object) {
+    return Object.keys(obj).reduce((result, key) => {
+      const snakeCaseKey = toSnakeCase(key);
+      result[snakeCaseKey] = convertKeysToSnakeCase(obj[key]);
+      return result;
+    }, {} as any);
+  }
+  return obj;
+};
+
 // Axiosインターセプターの設定
+axios.interceptors.request.use(
+  (config) => {
+    if (config.data) {
+      config.data = convertKeysToSnakeCase(config.data);
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 axios.interceptors.response.use(
   (response) => {
     response.data = toCamelCase(response.data);
@@ -27,7 +66,7 @@ axios.interceptors.response.use(
   }
 );
 
-interface menu {
+export interface menu {
   menuId: number;
   menuName: string;
   genreIds: number[];
@@ -44,7 +83,29 @@ export const useMenuStore = defineStore('menu', () => {
     return menuData.value;
   };
 
+  // メニューに紐づくジャンルを更新する
+  const updateMenuGenre = async (menuId: number, genreIds: number[]): Promise<menu> => {
+    const menuData = ref<menu>({} as menu);
+    await axios
+      .patch(`http://localhost:8080/v1/menus/${menuId}/genres`, { genreIds })
+      .then((response) => (console.log(response), (menuData.value = response.data.menu)))
+      .catch((error) => console.log(error));
+    return menuData.value;
+  };
+
+  // メニューに紐づくカテゴリを更新する
+  const updateMenuCategory = async (menuId: number, categoryIds: number[]): Promise<menu> => {
+    const menuData = ref<menu>({} as menu);
+    await axios
+      .patch(`http://localhost:8080/v1/menus/${menuId}/categories`, { categoryIds })
+      .then((response) => (menuData.value = response.data.menu))
+      .catch((error) => console.log(error));
+    return menuData.value;
+  };
+
   return {
     getMenus,
+    updateMenuGenre,
+    updateMenuCategory,
   };
 });

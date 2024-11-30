@@ -5,15 +5,13 @@
     </v-overlay>
     <v-container>
       <v-row>
-        <v-col>
-          <v-btn block variant="outlined" color="primary" @click="displayRandomMenus()">
-            全てのメニューをランダムに表示
-          </v-btn>
+        <v-col cols="auto">
+          <v-btn variant="flat" color="primary" @click="displayRandomMenus()"> 全てのメニューをランダムに表示 </v-btn>
         </v-col>
-        <v-col>
+        <v-col cols="auto">
           <v-select v-model="count" label="何件" :items="[1, 2, 3, 4, 5]" variant="outlined"> </v-select>
         </v-col>
-        <v-col>
+        <v-col cols="auto">
           <v-btn variant="outlined" color="primary" @click="displayRandomMenus(count)">
             ランダムに{{ count }}件表示
           </v-btn>
@@ -66,6 +64,9 @@
                   </v-chip>
                 </v-chip-group>
               </v-card-text>
+              <v-card-actions>
+                <v-btn block variant="flat" color="primary" @click="updateMenuGenre(item.id)">適用</v-btn>
+              </v-card-actions>
             </v-card>
           </v-menu>
         </template>
@@ -86,6 +87,9 @@
                   </v-chip>
                 </v-chip-group>
               </v-card-text>
+              <v-card-actions>
+                <v-btn block variant="flat" color="primary" @click="updateMenuCategory(item.id)">適用</v-btn>
+              </v-card-actions>
             </v-card>
           </v-menu>
         </template>
@@ -228,6 +232,46 @@ const editCategoryTags = (categoryIds: number[]) => {
     if (categoryIds.includes(category.id)) acc.push(index);
     return acc;
   }, []);
+};
+
+const updateMenuGenre = async (menuId: number) => {
+  // 選択されたジャンルIDを取得
+  const selectedGenreChipIds = selectedGenreChips.value.map((index) => GENRES[index].id);
+  // メニューのジャンルIDを更新
+  const result = await useMenuService().updateMenuGenre(menuId, selectedGenreChipIds);
+  // 更新に成功した場合、メニュー情報を更新
+  if (result) {
+    // フィルタリングされたメニューのジャンルIDを更新
+    const filteredMenuIndex = filteredMenu.value.findIndex((menu) => menu.id === result.menuId);
+    if (filteredMenuIndex !== -1) {
+      filteredMenu.value[filteredMenuIndex].genreIds = result.genreIds;
+    }
+    // 表示されているメニューのジャンルIDを更新
+    const displayedMenuIndex = displayedMenu.value.findIndex((menu) => menu.id === result.menuId);
+    if (displayedMenuIndex !== -1) {
+      displayedMenu.value[displayedMenuIndex].genreIds = result.genreIds;
+    }
+  }
+};
+
+const updateMenuCategory = async (menuId: number) => {
+  // 選択されたカテゴリIDを取得
+  const selectedCategoryChipIds = selectedCategoryChips.value.map((index) => CATEGORIES[index].id);
+  // メニューのカテゴリIDを更新
+  const result = await useMenuService().updateMenuCategory(menuId, selectedCategoryChipIds);
+  // 更新に成功した場合、メニュー情報を更新
+  if (result) {
+    // フィルタリングされたメニューのカテゴリIDを更新
+    const filteredMenuIndex = filteredMenu.value.findIndex((menu) => menu.id === result.menuId);
+    if (filteredMenuIndex !== -1) {
+      filteredMenu.value[filteredMenuIndex].categoryIds = result.categoryIds;
+    }
+    // 表示されているメニューのカテゴリIDを更新
+    const displayedMenuIndex = displayedMenu.value.findIndex((menu) => menu.id === result.menuId);
+    if (displayedMenuIndex !== -1) {
+      displayedMenu.value[displayedMenuIndex].categoryIds = result.categoryIds;
+    }
+  }
 };
 
 onMounted(async () => {
