@@ -1,8 +1,12 @@
 # ホーム画面
-<img width="1500" alt="スクリーンショット 2024-11-24 18 04 13" src="https://github.com/user-attachments/assets/52c71909-3e31-44f9-b49d-d33ed9271a89">
+<img width="1455" alt="スクリーンショット 2024-12-01 0 34 03" src="https://github.com/user-attachments/assets/9a3dccc2-a034-43a2-9b23-3ad6ea0319bc">
 
-# フィルター機能
+## フィルター機能
 <img width="1220" alt="スクリーンショット 2024-11-24 18 04 27" src="https://github.com/user-attachments/assets/b52d23c5-c760-4b78-8e82-5359c76de63f">
+
+## タグ付け更新機能 
+<img width="370" alt="スクリーンショット 2024-12-01 0 34 33" src="https://github.com/user-attachments/assets/62db64e5-5dee-42f5-8b14-3c438ab34c5a">
+
 
 # Nuxt 3 Minimal Starter
 
