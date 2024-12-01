@@ -131,7 +131,7 @@ const CATEGORIES = [
 ];
 
 const displayedMenu = ref<MenuInfo[]>([]); // v-data-tableに表示するメニュー
-const filteredMenu = ref<MenuInfo[]>([]); // カテゴリとジャンルの条件絞り込み後メニュー
+const filteredMenu = ref<MenuInfo[]>([]); // カテゴリとジャンルの条件絞り込み後メニュー（displayedMenuのシャローコピー）
 const count = ref<number>(3); // 表示するメニューの数
 const selectedGenreNames = ref<string[]>(GENRES.map((genre) => genre.name)); // 選択中のジャンル名
 const selectedCategoryNames = ref<string[]>(CATEGORIES.map((category) => category.name)); // 選択中のカテゴリ名
@@ -163,12 +163,13 @@ const filteredMenus = () => {
   // メニューをフィルタリング
   filteredMenu.value = menuList.value.filter(
     (menu) =>
-      menu.genreIds.every((id) => selectedGenreIds.includes(id)) &&
-      menu.categoryIds.every((id) => selectedCategoryIds.includes(id))
+      menu.genreIds.some((id) => selectedGenreIds.includes(id)) &&
+      menu.categoryIds.some((id) => selectedCategoryIds.includes(id))
   );
 
   // フィルタリングされたメニューを表示用に設定
-  displayedMenu.value = cloneDeep(filteredMenu.value);
+  // 深い要素は変更しないので、スプレッド構文でコピー
+  displayedMenu.value = [...filteredMenu.value];
 };
 
 watch(selectedGenreNames, () => {
@@ -240,15 +241,11 @@ const updateMenuGenre = async (menuId: number) => {
   // メニューのジャンルIDを更新
   const result = await useMenuService().updateMenuGenre(menuId, selectedGenreChipIds);
   // 更新に成功した場合、メニュー情報を更新
-  if (result) {
-    // フィルタリングされたメニューのジャンルIDを更新
-    const filteredMenuIndex = filteredMenu.value.findIndex((menu) => menu.id === result.menuId);
-    if (filteredMenuIndex !== -1) {
-      filteredMenu.value[filteredMenuIndex].genreIds = result.genreIds;
-    }
+  if (Object.keys(result).length > 0) {
     // 表示されているメニューのジャンルIDを更新
     const displayedMenuIndex = displayedMenu.value.findIndex((menu) => menu.id === result.menuId);
     if (displayedMenuIndex !== -1) {
+      // filteredMenuはシャローコピーなので、displayedMenuの要素を更新すると同時にfilteredMenuも更新される
       displayedMenu.value[displayedMenuIndex].genreIds = result.genreIds;
     }
   }
@@ -260,15 +257,11 @@ const updateMenuCategory = async (menuId: number) => {
   // メニューのカテゴリIDを更新
   const result = await useMenuService().updateMenuCategory(menuId, selectedCategoryChipIds);
   // 更新に成功した場合、メニュー情報を更新
-  if (result) {
-    // フィルタリングされたメニューのカテゴリIDを更新
-    const filteredMenuIndex = filteredMenu.value.findIndex((menu) => menu.id === result.menuId);
-    if (filteredMenuIndex !== -1) {
-      filteredMenu.value[filteredMenuIndex].categoryIds = result.categoryIds;
-    }
+  if (Object.keys(result).length > 0) {
     // 表示されているメニューのカテゴリIDを更新
     const displayedMenuIndex = displayedMenu.value.findIndex((menu) => menu.id === result.menuId);
     if (displayedMenuIndex !== -1) {
+      // filteredMenuはシャローコピーなので、displayedMenuの要素を更新すると同時にfilteredMenuも更新される
       displayedMenu.value[displayedMenuIndex].categoryIds = result.categoryIds;
     }
   }

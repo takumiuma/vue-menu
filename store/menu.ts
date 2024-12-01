@@ -75,32 +75,37 @@ export interface menu {
 
 export const useMenuStore = defineStore('menu', () => {
   const getMenus = async (): Promise<menu[]> => {
-    const menuData = ref<menu[]>([]);
-    await axios
-      .get('http://localhost:8080/v1/menus')
-      .then((response) => (menuData.value = response.data.menus))
-      .catch((error) => console.log(error));
-    return menuData.value;
+    try {
+      const response = await axios.get('http://localhost:8080/v1/menus');
+      return response.data.menus;
+    } catch (error) {
+      console.error('Failed to fetch menus:', error);
+      return [];
+    }
   };
 
   // メニューに紐づくジャンルを更新する
   const updateMenuGenre = async (menuId: number, genreIds: number[]): Promise<menu> => {
-    const menuData = ref<menu>({} as menu);
-    await axios
-      .patch(`http://localhost:8080/v1/menus/${menuId}/genres`, { genreIds })
-      .then((response) => (console.log(response), (menuData.value = response.data.menu)))
-      .catch((error) => console.log(error));
-    return menuData.value;
+    try {
+      const response = await axios.patch(`http://localhost:8080/v1/menus/${menuId}/genres`, { genreIds });
+      return response.data.menu;
+    } catch (error) {
+      console.error('Failed to update menu genre:', error);
+      // TODO:空のmenuオブジェクトだと通信の成功が判断しづらいので、エラーをスローするか、返すかを検討する
+      return {} as menu;
+    }
   };
 
   // メニューに紐づくカテゴリを更新する
   const updateMenuCategory = async (menuId: number, categoryIds: number[]): Promise<menu> => {
-    const menuData = ref<menu>({} as menu);
-    await axios
-      .patch(`http://localhost:8080/v1/menus/${menuId}/categories`, { categoryIds })
-      .then((response) => (menuData.value = response.data.menu))
-      .catch((error) => console.log(error));
-    return menuData.value;
+    try {
+      const response = await axios.patch(`http://localhost:8080/v1/menus/${menuId}/categories`, { categoryIds });
+      return response.data.menu;
+    } catch (error) {
+      console.error('Failed to update menu category:', error);
+      // TODO:空のmenuオブジェクトだと通信の成功が判断しづらいので、エラーをスローするか、返すかを検討する
+      return {} as menu;
+    }
   };
 
   return {
