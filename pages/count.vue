@@ -1,5 +1,4 @@
 <script setup>
-import { storeToRefs } from 'pinia';
 const counterStore = useCounterStore();
 const { increment } = counterStore;
 const { count } = storeToRefs(counterStore);
