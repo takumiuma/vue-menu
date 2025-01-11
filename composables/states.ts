@@ -1,7 +1,4 @@
 // composablesディレクトリ直下ファイルは自動インポート対象となる
-import { ref, computed } from 'vue';
-import { defineStore } from 'pinia';
-
 export const useCounterStore = defineStore(
   'counter',
   () => {

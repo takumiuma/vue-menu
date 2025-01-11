@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { ref } from 'vue';
 import { defineStore } from 'pinia';
 
 // スネークケースをキャメルケースに変換する関数

@@ -99,7 +99,7 @@
 </template>
 
 <script setup lang="ts">
-import { useMenuService, type MenuInfo } from '~/composables/menuService';
+import { useMenuService, type MenuInfo } from '~/composables/useMenuService';
 import { cloneDeep } from 'lodash';
 
 const { menuList } = useMenuService();
