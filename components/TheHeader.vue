@@ -15,7 +15,7 @@
     <!-- ユーザー登録機能できたらコメントオフする -->
     <!-- <template v-slot:append>
       <div class="pa-2">
-        <v-btn block> Logout </v-btn>
+        <v-btn block> <v-icon>{{ 'mdi-logout' }}</v-icon>Logout </v-btn>
       </div>
     </template> -->
   </v-navigation-drawer>
@@ -24,8 +24,8 @@
 export default {
   setup() {
     const ITEMS = [
-      { title: 'ホームメニュー', icon: 'mdi-food', link: '/' },
-      { title: 'カウント', icon: 'mdi-check', link: '/count' },
+      { title: 'ホーム', icon: 'mdi-food', link: '/' },
+      { title: 'メニューリスト', icon: 'mdi-table-edit', link: '/menuList' },
     ];
     return {
       ITEMS,
@@ -35,7 +35,7 @@ export default {
   data() {
     return {
       drawer: false,
-      title: 'メニューリスト',
+      title: 'MenuApp',
     };
   },
 };

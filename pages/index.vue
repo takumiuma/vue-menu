@@ -5,6 +5,7 @@
     </v-overlay>
     <v-container>
       <v-row>
+        <v-col><div class="text-h4 font-weight-bold">ランダムサーチ</div></v-col>
         <v-col cols="auto">
           <v-btn variant="flat" color="primary" @click="displayRandomMenus()"> 全てのメニューをランダムに表示 </v-btn>
         </v-col>
@@ -51,47 +52,11 @@
           <v-chip v-for="genreId in item.genreIds">
             {{ GENRES.find((genre) => genre.id === genreId)?.name }}
           </v-chip>
-          <v-menu :close-on-content-click="false">
-            <template #activator="{ props }">
-              <v-icon v-bind="props" icon="mdi-cog-outline" size="small" @click="editGenreTags(item.genreIds)" />
-            </template>
-            <v-card width="230px">
-              <v-card-title class="text-h6 font-weight-bold">{{ item.name }}</v-card-title>
-              <v-card-text class="d-flex justify-center">
-                <v-chip-group v-model="selectedGenreChips" column multiple mandatory="force">
-                  <v-chip v-for="genre in GENRES" variant="outlined" filter>
-                    {{ genre.name }}
-                  </v-chip>
-                </v-chip-group>
-              </v-card-text>
-              <v-card-actions>
-                <v-btn block variant="flat" color="primary" @click="updateMenuGenre(item.id)">適用</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-menu>
         </template>
         <template #item.categoryIds="{ item }">
           <v-chip v-for="categoryId in item.categoryIds">
             {{ CATEGORIES.find((category) => category.id === categoryId)?.name }}
           </v-chip>
-          <v-menu :close-on-content-click="false">
-            <template #activator="{ props }">
-              <v-icon v-bind="props" icon="mdi-cog-outline" size="small" @click="editCategoryTags(item.categoryIds)" />
-            </template>
-            <v-card width="250px">
-              <v-card-title class="text-h6 font-weight-bold">{{ item.name }}</v-card-title>
-              <v-card-text class="d-flex justify-center">
-                <v-chip-group v-model="selectedCategoryChips" column multiple>
-                  <v-chip v-for="category in CATEGORIES" variant="outlined" filter>
-                    {{ category.name }}
-                  </v-chip>
-                </v-chip-group>
-              </v-card-text>
-              <v-card-actions>
-                <v-btn block variant="flat" color="primary" @click="updateMenuCategory(item.id)">適用</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-menu>
         </template>
       </v-data-table>
     </v-container>
@@ -135,8 +100,6 @@ const filteredMenu = ref<MenuInfo[]>([]); // カテゴリとジャンルの条�
 const count = ref<number>(3); // 表示するメニューの数
 const selectedGenreNames = ref<string[]>(GENRES.map((genre) => genre.name)); // 選択中のジャンル名
 const selectedCategoryNames = ref<string[]>(CATEGORIES.map((category) => category.name)); // 選択中のカテゴリ名
-const selectedGenreChips = ref<number[]>([]);
-const selectedCategoryChips = ref<number[]>([]);
 
 const overlay = ref<boolean>(false);
 const loading = ref<boolean>(false);
@@ -215,56 +178,6 @@ const displayRandomMenus = (count: number = 0) => {
   const randomMenus = findMenusByIds(shuffledMenuIds);
   // countが指定されていればその数だけ表示
   displayedMenu.value = count ? randomMenus.slice(0, count) : randomMenus;
-};
-
-const editGenreTags = (genreIds: number[]) => {
-  // 選択されたジャンルIDを設定
-  // v-chip-groupのmodelはnumber[]
-  // 各v-chipのfilter=trueの要素がmodelに反映されるので、item.genreIdsに対応するGENRESのindexを設定
-  selectedGenreChips.value = GENRES.reduce<number[]>((acc, genre, index) => {
-    if (genreIds.includes(genre.id)) acc.push(index);
-    return acc;
-  }, []);
-};
-
-const editCategoryTags = (categoryIds: number[]) => {
-  // 選択されたカテゴリIDを設定
-  selectedCategoryChips.value = CATEGORIES.reduce<number[]>((acc, category, index) => {
-    if (categoryIds.includes(category.id)) acc.push(index);
-    return acc;
-  }, []);
-};
-
-const updateMenuGenre = async (menuId: number) => {
-  // 選択されたジャンルIDを取得
-  const selectedGenreChipIds = selectedGenreChips.value.map((index) => GENRES[index].id);
-  // メニューのジャンルIDを更新
-  const result = await useMenuService().updateMenuGenre(menuId, selectedGenreChipIds);
-  // 更新に成功した場合、メニュー情報を更新
-  if (Object.keys(result).length > 0) {
-    // 表示されているメニューのジャンルIDを更新
-    const displayedMenuIndex = displayedMenu.value.findIndex((menu) => menu.id === result.menuId);
-    if (displayedMenuIndex !== -1) {
-      // filteredMenuはシャローコピーなので、displayedMenuの要素を更新すると同時にfilteredMenuも更新される
-      displayedMenu.value[displayedMenuIndex].genreIds = result.genreIds;
-    }
-  }
-};
-
-const updateMenuCategory = async (menuId: number) => {
-  // 選択されたカテゴリIDを取得
-  const selectedCategoryChipIds = selectedCategoryChips.value.map((index) => CATEGORIES[index].id);
-  // メニューのカテゴリIDを更新
-  const result = await useMenuService().updateMenuCategory(menuId, selectedCategoryChipIds);
-  // 更新に成功した場合、メニュー情報を更新
-  if (Object.keys(result).length > 0) {
-    // 表示されているメニューのカテゴリIDを更新
-    const displayedMenuIndex = displayedMenu.value.findIndex((menu) => menu.id === result.menuId);
-    if (displayedMenuIndex !== -1) {
-      // filteredMenuはシャローコピーなので、displayedMenuの要素を更新すると同時にfilteredMenuも更新される
-      displayedMenu.value[displayedMenuIndex].categoryIds = result.categoryIds;
-    }
-  }
 };
 
 onMounted(async () => {
