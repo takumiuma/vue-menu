@@ -5,7 +5,7 @@
     </template>
     <v-app-bar-title><v-icon icon="$vuetify"></v-icon>{{ title }}</v-app-bar-title>
   </v-app-bar>
-  <v-navigation-drawer v-model="drawer" :location="$vuetify.display.mobile ? 'bottom' : undefined" temporary>
+  <v-navigation-drawer v-model="drawer" :location="$vuetify.display.mobile ? 'top' : undefined" temporary>
     <v-list>
       <v-list-item v-for="item in ITEMS" :key="item.title" :to="item.link">
         <v-icon>{{ item.icon }}</v-icon>

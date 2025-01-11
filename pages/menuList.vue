@@ -6,6 +6,9 @@
     <v-container>
       <v-row>
         <v-col><div class="text-h4 font-weight-bold">メニューリスト</div></v-col>
+        <v-col cols="auto">
+          <v-btn color="primary" @click="dialog = true">新しくメニューを追加</v-btn>
+        </v-col>
       </v-row>
     </v-container>
     <v-container>
@@ -73,7 +76,7 @@
             <v-card width="250px">
               <v-card-title class="text-h6 font-weight-bold">{{ item.name }}</v-card-title>
               <v-card-text class="d-flex justify-center">
-                <v-chip-group v-model="selectedCategoryChips" column multiple>
+                <v-chip-group v-model="selectedCategoryChips" column multiple mandatory="force">
                   <v-chip v-for="category in CATEGORIES" variant="outlined" filter>
                     {{ category.name }}
                   </v-chip>
@@ -87,10 +90,37 @@
         </template>
       </v-data-table>
     </v-container>
+    <v-dialog v-model="dialog" max-width="500px">
+      <v-card>
+        <v-card-title>
+          <h2>{{ dialogLabel }}</h2>
+        </v-card-title>
+        <v-card-text>
+          <v-text-field v-model="editedItem.menuName" clearable label="新メニュー"></v-text-field>
+          <h3 class="mb-2">ジャンル</h3>
+          <v-chip-group v-model="editedItem.genreIds" column multiple mandatory="force">
+            <v-chip v-for="genre in GENRES" variant="outlined" filter>
+              {{ genre.name }}
+            </v-chip>
+          </v-chip-group>
+          <h3 class="mb-2">カテゴリ</h3>
+          <v-chip-group v-model="editedItem.categoryIds" column multiple mandatory="force">
+            <v-chip v-for="category in CATEGORIES" variant="outlined" filter>
+              {{ category.name }}
+            </v-chip>
+          </v-chip-group>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn variant="outlined" color="primary" @click="dialog = false">閉じる</v-btn>
+          <v-btn variant="flat" color="primary" @click="saveMenu">保存</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
+import { type menu } from '~/store/menu';
 import { useMenuService, type MenuInfo } from '~/composables/useMenuService';
 import { cloneDeep } from 'lodash';
 
@@ -127,6 +157,10 @@ const selectedGenreNames = ref<string[]>(GENRES.map((genre) => genre.name)); // 
 const selectedCategoryNames = ref<string[]>(CATEGORIES.map((category) => category.name)); // 選択中のカテゴリ名
 const selectedGenreChips = ref<number[]>([]);
 const selectedCategoryChips = ref<number[]>([]);
+
+const editedItem = ref<menu>({ menuId: 0, menuName: '', genreIds: [], categoryIds: [] });
+const dialogLabel = computed(() => (editedItem.value.menuId === 0 ? 'メニュー追加' : 'メニュー編集'));
+const dialog = ref<boolean>(false);
 
 const overlay = ref<boolean>(false);
 const loading = ref<boolean>(false);
@@ -168,6 +202,32 @@ watch(selectedGenreNames, () => {
 watch(selectedCategoryNames, () => {
   filteredMenus();
 });
+
+watch(dialog, () => {
+  if (!dialog.value) clearEditedItem();
+});
+
+const clearEditedItem = () => {
+  editedItem.value = { menuId: 0, menuName: '', genreIds: [], categoryIds: [] };
+};
+
+const saveMenu = async () => {
+  // if (editedItem.value.menuId === 0) {
+  // 新規メニューの場合
+  const result = await useMenuService().createMenu(editedItem.value);
+  if (Object.keys(result).length > 0) {
+    // TODO:失敗時はアラートを表示するようなエラーハンドリングを追加
+    // メニュー作成成功時は、再度メニュー情報を取得
+    overlay.value = true;
+    loading.value = true;
+    await useMenuService().getMenuInfoList();
+    // メニューリストを表示用にコピー。元データは保持。
+    displayedMenu.value = cloneDeep(menuList.value);
+  }
+  dialog.value = false;
+  overlay.value = false;
+  loading.value = false;
+};
 
 const editGenreTags = (genreIds: number[]) => {
   // 選択されたジャンルIDを設定
