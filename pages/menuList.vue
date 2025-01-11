@@ -88,6 +88,10 @@
             </v-card>
           </v-menu>
         </template>
+        <template #item.action="{ item }">
+          <v-icon @click="editMenu(item)" class="mr-2">mdi-pencil</v-icon>
+          <!-- <v-icon @click="deleteMenu(item)">mdi-delete</v-icon> -->
+        </template>
       </v-data-table>
     </v-container>
     <v-dialog v-model="dialog" max-width="500px">
@@ -98,13 +102,13 @@
         <v-card-text>
           <v-text-field v-model="editedItem.menuName" clearable label="新メニュー"></v-text-field>
           <h3 class="mb-2">ジャンル</h3>
-          <v-chip-group v-model="editedItem.genreIds" column multiple mandatory="force">
+          <v-chip-group v-model="selectedGenreChips" column multiple mandatory="force">
             <v-chip v-for="genre in GENRES" variant="outlined" filter>
               {{ genre.name }}
             </v-chip>
           </v-chip-group>
           <h3 class="mb-2">カテゴリ</h3>
-          <v-chip-group v-model="editedItem.categoryIds" column multiple mandatory="force">
+          <v-chip-group v-model="selectedCategoryChips" column multiple mandatory="force">
             <v-chip v-for="category in CATEGORIES" variant="outlined" filter>
               {{ category.name }}
             </v-chip>
@@ -130,6 +134,7 @@ const HEADERS = [
   { title: 'メニュー', value: 'name' },
   { title: 'ジャンル', value: 'genreIds' },
   { title: 'カテゴリ', value: 'categoryIds' },
+  { title: 'Action', value: 'action' },
 ];
 const GENRES = [
   { id: 1, name: '和食' },
@@ -209,21 +214,50 @@ watch(dialog, () => {
 
 const clearEditedItem = () => {
   editedItem.value = { menuId: 0, menuName: '', genreIds: [], categoryIds: [] };
+  selectedGenreChips.value = [];
+  selectedCategoryChips.value = [];
 };
 
 const saveMenu = async () => {
-  // if (editedItem.value.menuId === 0) {
-  // 新規メニューの場合
-  const result = await useMenuService().createMenu(editedItem.value);
-  if (Object.keys(result).length > 0) {
-    // TODO:失敗時はアラートを表示するようなエラーハンドリングを追加
-    // メニュー作成成功時は、再度メニュー情報を取得
-    overlay.value = true;
-    loading.value = true;
-    await useMenuService().getMenuInfoList();
-    // メニューリストを表示用にコピー。元データは保持。
-    displayedMenu.value = cloneDeep(menuList.value);
+  overlay.value = true;
+  loading.value = true;
+  if (editedItem.value.menuId === 0) {
+    // 新規メニュー作成
+
+    // 選択されたジャンルIDを取得
+    const selectedGenreChipIds = selectedGenreChips.value.map((index) => GENRES[index].id);
+    editedItem.value.genreIds = selectedGenreChipIds;
+    // 選択されたカテゴリIDを取得
+    const selectedCategoryChipIds = selectedCategoryChips.value.map((index) => CATEGORIES[index].id);
+    editedItem.value.categoryIds = selectedCategoryChipIds;
+    // メニューを新規作成
+    const result = await useMenuService().createMenu(editedItem.value);
+    if (Object.keys(result).length > 0) {
+      // TODO:失敗時はアラートを表示するようなエラーハンドリングを追加
+      // メニュー作成成功時は、再度メニュー情報を取得
+      await useMenuService().getMenuInfoList();
+      // メニューリストを表示用にコピー。元データは保持。
+      displayedMenu.value = cloneDeep(menuList.value);
+    }
+  } else {
+    // メニューを更新
+
+    // 選択されたジャンルIDを取得
+    const selectedGenreChipIds = selectedGenreChips.value.map((index) => GENRES[index].id);
+    editedItem.value.genreIds = selectedGenreChipIds;
+    // 選択されたカテゴリIDを取得
+    const selectedCategoryChipIds = selectedCategoryChips.value.map((index) => CATEGORIES[index].id);
+    editedItem.value.categoryIds = selectedCategoryChipIds;
+    // メニューを更新
+    const result = await useMenuService().updateMenu(editedItem.value);
+    if (Object.keys(result).length > 0) {
+      // メニュー作成成功時は、再度メニュー情報を取得
+      await useMenuService().getMenuInfoList();
+      // メニューリストを表示用にコピー。元データは保持。
+      displayedMenu.value = cloneDeep(menuList.value);
+    }
   }
+
   dialog.value = false;
   overlay.value = false;
   loading.value = false;
@@ -245,6 +279,13 @@ const editCategoryTags = (categoryIds: number[]) => {
     if (categoryIds.includes(category.id)) acc.push(index);
     return acc;
   }, []);
+};
+
+const editMenu = (menu: MenuInfo) => {
+  editGenreTags(menu.genreIds);
+  editCategoryTags(menu.categoryIds);
+  editedItem.value = { menuId: menu.id, menuName: menu.name, genreIds: menu.genreIds, categoryIds: menu.categoryIds };
+  dialog.value = true;
 };
 
 const updateMenuGenre = async (menuId: number) => {

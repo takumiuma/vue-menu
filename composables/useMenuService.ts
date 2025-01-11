@@ -30,8 +30,18 @@ const getMenuInfoList = async (): Promise<void> => {
   );
 };
 
+/**
+ * メニューを新規作成する
+ */
 const createMenu = async (menu: menu): Promise<menu> => {
   return await useMenuStore().createMenu(menu);
+};
+
+/**
+ * メニューを更新する
+ */
+const updateMenu = async (menu: menu): Promise<menu> => {
+  return await useMenuStore().updateMenu(menu);
 };
 
 /**
@@ -68,6 +78,7 @@ export const useMenuService = () => {
     menuList,
     getMenuInfoList,
     createMenu,
+    updateMenu,
     updateMenuGenre,
     updateMenuCategory,
   };

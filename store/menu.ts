@@ -31,6 +31,17 @@ export const useMenuStore = defineStore('menu', () => {
     }
   };
 
+  // メニューを更新する
+  const updateMenu = async (menu: menu): Promise<menu> => {
+    try {
+      const response = await axios.put(`/v1/menus/${menu.menuId}`, menu);
+      return response.data.menu;
+    } catch (error) {
+      console.error('Failed to update menu:', error);
+      return {} as menu;
+    }
+  };
+
   // メニューに紐づくジャンルを更新する
   const updateMenuGenre = async (menuId: number, genreIds: number[]): Promise<menu> => {
     try {
@@ -58,6 +69,7 @@ export const useMenuStore = defineStore('menu', () => {
   return {
     getMenus,
     createMenu,
+    updateMenu,
     updateMenuGenre,
     updateMenuCategory,
   };
