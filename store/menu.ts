@@ -42,6 +42,15 @@ export const useMenuStore = defineStore('menu', () => {
     }
   };
 
+  // メニューを削除する
+  const deleteMenu = async (menuId: number): Promise<void> => {
+    try {
+      await axios.delete(`/v1/menus/${menuId}`);
+    } catch (error) {
+      console.error('Failed to delete menu:', error);
+    }
+  };
+
   // メニューに紐づくジャンルを更新する
   const updateMenuGenre = async (menuId: number, genreIds: number[]): Promise<menu> => {
     try {
@@ -70,6 +79,7 @@ export const useMenuStore = defineStore('menu', () => {
     getMenus,
     createMenu,
     updateMenu,
+    deleteMenu,
     updateMenuGenre,
     updateMenuCategory,
   };

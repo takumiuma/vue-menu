@@ -1,8 +1,5 @@
 <template>
   <div>
-    <v-overlay v-model="overlay" class="align-center justify-center">
-      <v-progress-circular size="64" indeterminate />
-    </v-overlay>
     <v-container>
       <v-row>
         <v-col><div class="text-h4 font-weight-bold">メニューリスト</div></v-col>
@@ -90,7 +87,7 @@
         </template>
         <template #item.action="{ item }">
           <v-icon @click="editMenu(item)" class="mr-2">mdi-pencil</v-icon>
-          <!-- <v-icon @click="deleteMenu(item)">mdi-delete</v-icon> -->
+          <v-icon @click="deleteMenu(item.id)">mdi-delete</v-icon>
         </template>
       </v-data-table>
     </v-container>
@@ -100,7 +97,7 @@
           <h2>{{ dialogLabel }}</h2>
         </v-card-title>
         <v-card-text>
-          <v-text-field v-model="editedItem.menuName" clearable label="新メニュー"></v-text-field>
+          <v-text-field v-model="editedItem.menuName" clearable label="メニュー"></v-text-field>
           <h3 class="mb-2">ジャンル</h3>
           <v-chip-group v-model="selectedGenreChips" column multiple mandatory="force">
             <v-chip v-for="genre in GENRES" variant="outlined" filter>
@@ -126,6 +123,7 @@
 <script setup lang="ts">
 import { type menu } from '~/store/menu';
 import { useMenuService, type MenuInfo } from '~/composables/useMenuService';
+import { useLoadingOverlayStore } from '~/composables/useLoadingOverlayService';
 import { cloneDeep } from 'lodash';
 
 const { menuList } = useMenuService();
@@ -167,7 +165,6 @@ const editedItem = ref<menu>({ menuId: 0, menuName: '', genreIds: [], categoryId
 const dialogLabel = computed(() => (editedItem.value.menuId === 0 ? 'メニュー追加' : 'メニュー編集'));
 const dialog = ref<boolean>(false);
 
-const overlay = ref<boolean>(false);
 const loading = ref<boolean>(false);
 
 /**
@@ -219,7 +216,7 @@ const clearEditedItem = () => {
 };
 
 const saveMenu = async () => {
-  overlay.value = true;
+  useLoadingOverlayStore().startLoading();
   loading.value = true;
   if (editedItem.value.menuId === 0) {
     // 新規メニュー作成
@@ -259,7 +256,7 @@ const saveMenu = async () => {
   }
 
   dialog.value = false;
-  overlay.value = false;
+  useLoadingOverlayStore().endLoading();
   loading.value = false;
 };
 
@@ -320,13 +317,28 @@ const updateMenuCategory = async (menuId: number) => {
   }
 };
 
+const deleteMenu = async (menuId: number) => {
+  if (!confirm('削除してよろしいですか')) return;
+
+  useLoadingOverlayStore().startLoading();
+  loading.value = true;
+  // メニューを削除
+  await useMenuService().deleteMenu(menuId);
+  // メニュー作成成功時は、再度メニュー情報を取得
+  await useMenuService().getMenuInfoList();
+  // メニューリストを表示用にコピー。元データは保持。
+  displayedMenu.value = cloneDeep(menuList.value);
+  useLoadingOverlayStore().endLoading();
+  loading.value = false;
+};
+
 onMounted(async () => {
-  overlay.value = true;
+  useLoadingOverlayStore().startLoading();
   loading.value = true;
   await useMenuService().getMenuInfoList();
   // メニューリストを表示用にコピー。元データは保持。
   displayedMenu.value = cloneDeep(menuList.value);
-  overlay.value = false;
+  useLoadingOverlayStore().endLoading();
   loading.value = false;
 });
 </script>

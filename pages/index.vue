@@ -1,8 +1,5 @@
 <template>
   <div>
-    <v-overlay v-model="overlay" class="align-center justify-center">
-      <v-progress-circular size="64" indeterminate />
-    </v-overlay>
     <v-container>
       <v-row>
         <v-col><div class="text-h4 font-weight-bold">ランダムサーチ</div></v-col>
@@ -65,6 +62,7 @@
 
 <script setup lang="ts">
 import { useMenuService, type MenuInfo } from '~/composables/useMenuService';
+import { useLoadingOverlayStore } from '~/composables/useLoadingOverlayService';
 import { cloneDeep } from 'lodash';
 
 const { menuList } = useMenuService();
@@ -101,7 +99,6 @@ const count = ref<number>(3); // 表示するメニューの数
 const selectedGenreNames = ref<string[]>(GENRES.map((genre) => genre.name)); // 選択中のジャンル名
 const selectedCategoryNames = ref<string[]>(CATEGORIES.map((category) => category.name)); // 選択中のカテゴリ名
 
-const overlay = ref<boolean>(false);
 const loading = ref<boolean>(false);
 
 /**
@@ -181,12 +178,12 @@ const displayRandomMenus = (count: number = 0) => {
 };
 
 onMounted(async () => {
-  overlay.value = true;
+  useLoadingOverlayStore().startLoading();
   loading.value = true;
   await useMenuService().getMenuInfoList();
   // メニューリストを表示用にコピー。元データは保持。
   displayedMenu.value = cloneDeep(menuList.value);
-  overlay.value = false;
+  useLoadingOverlayStore().endLoading();
   loading.value = false;
 });
 </script>

@@ -45,6 +45,13 @@ const updateMenu = async (menu: menu): Promise<menu> => {
 };
 
 /**
+ * メニューを削除する
+ */
+const deleteMenu = async (menuId: number): Promise<void> => {
+  await useMenuStore().deleteMenu(menuId);
+};
+
+/**
  * メニューに紐づくジャンルを更新する
  */
 const updateMenuGenre = async (menuId: number, genreIds: number[]): Promise<menu> => {
@@ -79,6 +86,7 @@ export const useMenuService = () => {
     getMenuInfoList,
     createMenu,
     updateMenu,
+    deleteMenu,
     updateMenuGenre,
     updateMenuCategory,
   };
