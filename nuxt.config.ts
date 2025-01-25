@@ -1,6 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify';
-import { createPinia } from 'pinia';
 export default defineNuxtConfig({
   devtools: { enabled: true },
   //...
