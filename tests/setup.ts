@@ -1,12 +1,12 @@
 import { vi } from 'vitest'
 
 // Mock Nuxt composables and runtime
-global.definePageMeta = vi.fn()
-global.defineNuxtPlugin = vi.fn()
-global.defineNuxtRouteMiddleware = vi.fn()
-global.navigateTo = vi.fn()
-global.abortNavigation = vi.fn()
-global.setPageLayout = vi.fn()
+;(global as any).definePageMeta = vi.fn()
+;(global as any).defineNuxtPlugin = vi.fn()
+;(global as any).defineNuxtRouteMiddleware = vi.fn()
+;(global as any).navigateTo = vi.fn()
+;(global as any).abortNavigation = vi.fn()
+;(global as any).setPageLayout = vi.fn()
 
 // Mock console to reduce noise in tests
 global.console = {

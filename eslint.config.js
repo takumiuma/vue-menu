@@ -4,6 +4,6 @@ export default createConfigForNuxt({
   features: {
     typescript: true,
     vue: true,
-    stylistic: true
-  }
+    stylistic: true,
+  },
 })
