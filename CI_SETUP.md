@@ -1,80 +1,80 @@
-# CI Setup
+# CI セットアップ
 
-This project includes a comprehensive GitHub Actions CI pipeline with the following features:
+このプロジェクトには以下の機能を持つ包括的なGitHub Actions CIパイプラインが含まれています：
 
-## Workflow Jobs
+## ワークフロージョブ
 
 ### 1. ESLint
-- Runs ESLint with Vue and TypeScript support
-- Uses `@nuxt/eslint-config` for Nuxt-specific rules
-- Command: `yarn lint`
+- VueとTypeScriptサポートでESLintを実行
+- Nuxt固有のルールに`@nuxt/eslint-config`を使用
+- コマンド: `yarn lint`
 
-### 2. TypeScript Type Check
-- Runs static type analysis with vue-tsc
-- Ensures type safety across Vue components and TypeScript files
-- Command: `yarn type-check`
+### 2. TypeScript型チェック
+- vue-tscで静的型解析を実行
+- VueコンポーネントとTypeScriptファイル全体で型安全性を確保
+- コマンド: `yarn type-check`
 
-### 3. Unit Tests (Vitest)
-- Fast unit testing with Vitest
-- Configured for Vue components with jsdom environment
-- Command: `yarn test:run`
+### 3. ユニットテスト (Vitest)
+- Vitestによる高速ユニットテスト
+- jsdom環境でVueコンポーネント用に設定
+- コマンド: `yarn test:run`
 
-### 4. Security Audit
-- Checks for known vulnerabilities in dependencies
-- Uses `yarn audit` with moderate level threshold
-- Command: `yarn audit`
+### 4. セキュリティ監査
+- 依存関係の既知の脆弱性をチェック
+- `yarn audit`を中程度のレベル閾値で使用
+- コマンド: `yarn audit`
 
-### 5. Build Verification
-- Ensures the application builds successfully
-- Uploads build artifacts for potential deployment
-- Command: `yarn build`
+### 5. ビルド検証
+- アプリケーションが正常にビルドされることを確認
+- 潜在的なデプロイメント用にビルド成果物をアップロード
+- コマンド: `yarn build`
 
-### 6. E2E Tests (Playwright)
-- Smoke tests to verify application loads without errors
-- Tests key user flows and page functionality
-- Command: `yarn test:e2e`
+### 6. E2Eテスト (Playwright)
+- アプリケーションがエラーなしで読み込まれることを検証するスモークテスト
+- 主要なユーザーフローとページ機能をテスト
+- コマンド: `yarn test:e2e`
 
-### 7. CodeQL Security Analysis
-- GitHub's advanced security analysis
-- Scans for security vulnerabilities and code quality issues
-- Automatically runs on push and PR events
+### 7. CodeQLセキュリティ解析
+- GitHubの高度なセキュリティ解析
+- セキュリティ脆弱性とコード品質の問題をスキャン
+- pushとPRイベントで自動実行
 
-## Triggers
+## トリガー
 
-The CI workflow runs on:
-- Push to `main` and `develop` branches
-- Pull requests targeting `main` and `develop` branches
+CIワークフローは以下の場合に実行されます：
+- `main`と`develop`ブランチへのpush
+- `main`と`develop`ブランチをターゲットとするプルリクエスト
 
-## Local Development
+## ローカル開発
 
-All CI checks can be run locally:
+すべてのCIチェックはローカルで実行できます：
 
 ```bash
-# Install dependencies
+# 依存関係のインストール
 yarn install
 
-# Run linting
+# リンティングの実行
 yarn lint
 
-# Run type checking
+# 型チェックの実行
 yarn type-check
 
-# Run unit tests
+# ユニットテストの実行
 yarn test
 
-# Run E2E tests (requires dev server)
-yarn dev # in one terminal
-yarn test:e2e # in another terminal
+# E2Eテストの実行（開発サーバーが必要）
+yarn dev # 一つのターミナルで
+yarn test:e2e # 別のターミナルで
 
-# Build the application
+# アプリケーションのビルド
 yarn build
 
-# Check for vulnerabilities
+# 脆弱性のチェック
 yarn audit
 ```
 
-## Additional Tools Available
+## 利用可能な追加ツール
 
-- **Prettier**: Code formatting (`yarn format`)
-- **Test UI**: Interactive test runner (`yarn test:ui`)
-- **Coverage**: Test coverage reporting (`yarn test:coverage`)
+- **Prettier**: コード整形 (`yarn format`)
+- **Test UI**: インタラクティブテストランナー (`yarn test:ui`)
+- **Coverage**: テストカバレッジレポート (`yarn test:coverage`)
