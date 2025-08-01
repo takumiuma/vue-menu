@@ -7,14 +7,31 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "type-check": "vue-tsc --noEmit",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install",
+    "audit": "yarn audit"
   },
   "devDependencies": {
+    "@eslint/js": "^9.32.0",
     "@nuxt/devtools": "latest",
+    "@nuxt/eslint-config": "^1.7.1",
+    "@playwright/test": "^1.54.1",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "eslint": "^9.32.0",
+    "eslint-plugin-vue": "^10.4.0",
     "nuxt": "^3.8.2",
+    "playwright": "^1.54.1",
+    "typescript": "^5.9.2",
     "vite-plugin-vuetify": "^2.0.1",
     "vue": "^3.3.8",
+    "vue-eslint-parser": "^10.2.0",
     "vue-router": "^4.2.5",
+    "vue-tsc": "^3.0.4",
     "vuetify": "^3.7.4"
   },
   "dependencies": {
