@@ -42,8 +42,8 @@
 ## トリガー
 
 CIワークフローは以下の場合に実行されます：
-- `main`と`develop`ブランチへのpush
-- `main`と`develop`ブランチをターゲットとするプルリクエスト
+- `master`と`develop`ブランチへのpush
+- `master`と`develop`ブランチをターゲットとするプルリクエスト
 
 ## ローカル開発
 
