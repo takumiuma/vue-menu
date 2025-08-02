@@ -1,6 +1,5 @@
 import { defineConfig } from 'vitest/config'
 import { resolve } from 'path'
-// @ts-expect-error Module resolution issue with Nuxt's TypeScript config
 import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
