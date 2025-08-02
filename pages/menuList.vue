@@ -245,6 +245,11 @@ import { useMenuService, type MenuInfo } from '~/composables/useMenuService'
 import { useLoadingOverlayStore } from '~/composables/useLoadingOverlayService'
 import { cloneDeep } from 'lodash'
 
+// Set page title for SEO and testing
+useHead({
+  title: 'Vue Menu - メニューリスト'
+})
+
 const { menuList } = useMenuService()
 
 const HEADERS = [
