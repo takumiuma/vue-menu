@@ -247,7 +247,7 @@ import { cloneDeep } from 'lodash'
 
 // Set page title for SEO and testing
 useHead({
-  title: "Vue Menu - メニューリスト"
+  title: 'Vue Menu - メニューリスト'
 })
 
 const { menuList } = useMenuService()
