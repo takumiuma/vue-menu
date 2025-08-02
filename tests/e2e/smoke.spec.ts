@@ -104,12 +104,20 @@ test.describe('Smoke Tests', () => {
 
     await page.goto('/')
 
+    // Open navigation drawer by clicking the nav icon
+    await page.locator('.v-app-bar-nav-icon').click()
+    await page.waitForTimeout(500) // Wait for drawer animation
+
     // Navigate to menu list using the navigation
-    await page.click('text=一覧')
+    await page.locator('.v-list-item').filter({ hasText: 'メニューリスト' }).click()
     await expect(page).toHaveURL(/.*menuList/)
 
+    // Open navigation drawer again for going back
+    await page.locator('.v-app-bar-nav-icon').click()
+    await page.waitForTimeout(500) // Wait for drawer animation
+
     // Navigate back to home
-    await page.click('text=ホーム')
+    await page.locator('.v-list-item').filter({ hasText: 'ホーム' }).click()
     await expect(page).toHaveURL(/.*\//)
   })
 })
