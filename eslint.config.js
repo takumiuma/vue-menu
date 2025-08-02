@@ -1,42 +1,26 @@
 import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
+import eslintConfigPrettier from 'eslint-config-prettier'
 
 export default createConfigForNuxt({
   features: {
     typescript: true,
     vue: true,
-    stylistic: false, // Disable stylistic rules to avoid conflicts with Prettier
+    stylistic: true, // スタイリスティック機能を有効にして、Format on Saveでフォーマットを実行
   },
 })
   .override('nuxt/vue/rules', {
     rules: {
-      // Allow Vuetify data table slot syntax with dots (e.g., #item.shopSearch)
+      // Vuetifyのデータテーブルスロット構文でドット表記を許可 (例: #item.shopSearch)
       'vue/valid-v-slot': [
         'error',
         {
           allowModifiers: true,
         },
       ],
-      // Disable Vue stylistic rules that conflict with Prettier
-      'vue/max-attributes-per-line': 'off',
-      'vue/singleline-html-element-content-newline': 'off',
-      'vue/multiline-html-element-content-newline': 'off',
-      'vue/html-indent': 'off',
-      'vue/html-closing-bracket-newline': 'off',
-      'vue/html-closing-bracket-spacing': 'off',
-      'vue/html-self-closing': 'off',
     },
   })
-  // Add prettier config to turn off conflicting rules
+  // Prettierとの互換性設定を追加 - eslint-config-prettierを使用
   .append({
     name: 'prettier-compatibility',
-    rules: {
-      // Turn off all stylistic rules that might conflict with Prettier
-      '@stylistic/arrow-parens': 'off',
-      '@stylistic/brace-style': 'off',
-      '@stylistic/comma-dangle': 'off',
-      '@stylistic/operator-linebreak': 'off',
-      '@stylistic/quotes': 'off',
-      '@stylistic/semi': 'off',
-      '@stylistic/indent': 'off',
-    },
+    ...eslintConfigPrettier,
   })

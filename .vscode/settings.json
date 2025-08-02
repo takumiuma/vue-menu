@@ -1,12 +1,13 @@
 {
-  // Editor settings
+  // エディタの設定
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
 
-  // File type specific formatters
+  // ファイルタイプ別のフォーマッター設定
   "[javascript]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
@@ -22,16 +23,33 @@
   "[vue]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
 
-  // ESLint settings
+  // ESLintの設定
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact", "vue"],
   "eslint.format.enable": true,
+  "eslint.codeActionsOnSave.rules": null,
 
-  // Prettier settings
+  // Prettierの設定
   "prettier.requireConfig": true,
+  "prettier.useEditorConfig": false,
 
-  // Files settings
+  // ファイルの設定
   "files.eol": "\n",
   "files.insertFinalNewline": true,
-  "files.trimTrailingWhitespace": true
+  "files.trimTrailingWhitespace": true,
+  "files.autoSave": "onFocusChange",
+
+  // 日本語開発者向けの追加設定
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false
 }
