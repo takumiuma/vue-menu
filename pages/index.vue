@@ -3,45 +3,25 @@
     <v-container>
       <v-row>
         <v-col>
-          <div class="text-h4 font-weight-bold">
-            ランダムサーチ
-          </div>
+          <div class="text-h4 font-weight-bold">ランダムサーチ</div>
         </v-col>
         <v-col cols="auto">
-          <v-btn
-            variant="flat"
-            color="primary"
-            @click="displayRandomMenus()"
-          >
+          <v-btn variant="flat" color="primary" @click="displayRandomMenus()">
             全てのメニューをランダムに表示
           </v-btn>
         </v-col>
         <v-col cols="auto">
-          <v-select
-            v-model="count"
-            label="何件"
-            :items="[1, 2, 3, 4, 5]"
-            variant="outlined"
-          />
+          <v-select v-model="count" label="何件" :items="[1, 2, 3, 4, 5]" variant="outlined" />
         </v-col>
         <v-col cols="auto">
-          <v-btn
-            variant="outlined"
-            color="primary"
-            @click="displayRandomMenus(count)"
-          >
+          <v-btn variant="outlined" color="primary" @click="displayRandomMenus(count)">
             ランダムに{{ count }}件表示
           </v-btn>
         </v-col>
       </v-row>
     </v-container>
     <v-container>
-      <v-data-table
-        :headers="HEADERS"
-        :items="displayedMenu"
-        hover
-        :loading="loading"
-      >
+      <v-data-table :headers="HEADERS" :items="displayedMenu" hover :loading="loading">
         <template #top>
           <v-combobox
             v-model="selectedGenreNames"
@@ -64,30 +44,18 @@
           <v-skeleton-loader type="table-row@10" />
         </template>
         <template #item.shopSearch="{ item }">
-          <a
-            :href="item.shopSearch"
-            target="_blank"
-          >{{ `「${item.name} お店 近く」で検索` }}</a>
+          <a :href="item.shopSearch" target="_blank">{{ `「${item.name} お店 近く」で検索` }}</a>
         </template>
         <template #item.recipeSearch="{ item }">
-          <a
-            :href="item.recipeSearch"
-            target="_blank"
-          >{{ `「${item.name}のレシピ」を検索` }}</a>
+          <a :href="item.recipeSearch" target="_blank">{{ `「${item.name}のレシピ」を検索` }}</a>
         </template>
         <template #item.genreIds="{ item }">
-          <v-chip
-            v-for="genreId in item.genreIds"
-            :key="genreId"
-          >
+          <v-chip v-for="genreId in item.genreIds" :key="genreId">
             {{ GENRES.find((genre) => genre.id === genreId)?.name }}
           </v-chip>
         </template>
         <template #item.categoryIds="{ item }">
-          <v-chip
-            v-for="categoryId in item.categoryIds"
-            :key="categoryId"
-          >
+          <v-chip v-for="categoryId in item.categoryIds" :key="categoryId">
             {{ CATEGORIES.find((category) => category.id === categoryId)?.name }}
           </v-chip>
         </template>
@@ -137,8 +105,8 @@ const CATEGORIES = [
 const displayedMenu = ref<MenuInfo[]>([]) // v-data-tableに表示するメニュー
 const filteredMenu = ref<MenuInfo[]>([]) // カテゴリとジャンルの条件絞り込み後メニュー（displayedMenuのシャローコピー）
 const count = ref<number>(3) // 表示するメニューの数
-const selectedGenreNames = ref<string[]>(GENRES.map(genre => genre.name)) // 選択中のジャンル名
-const selectedCategoryNames = ref<string[]>(CATEGORIES.map(category => category.name)) // 選択中のカテゴリ名
+const selectedGenreNames = ref<string[]>(GENRES.map((genre) => genre.name)) // 選択中のジャンル名
+const selectedCategoryNames = ref<string[]>(CATEGORIES.map((category) => category.name)) // 選択中のカテゴリ名
 
 const loading = ref<boolean>(false)
 
@@ -152,20 +120,20 @@ const loading = ref<boolean>(false)
  */
 const filteredMenus = () => {
   // 選択されたジャンル名に対応するジャンルIDを取得
-  const selectedGenreIds = GENRES.filter(genre => selectedGenreNames.value.includes(genre.name)).map(
-    genre => genre.id,
-  )
+  const selectedGenreIds = GENRES.filter((genre) =>
+    selectedGenreNames.value.includes(genre.name)
+  ).map((genre) => genre.id)
 
   // 選択されたカテゴリ名に対応するカテゴリIDを取得
-  const selectedCategoryIds = CATEGORIES.filter(category => selectedCategoryNames.value.includes(category.name)).map(
-    category => category.id,
-  )
+  const selectedCategoryIds = CATEGORIES.filter((category) =>
+    selectedCategoryNames.value.includes(category.name)
+  ).map((category) => category.id)
 
   // メニューをフィルタリング
   filteredMenu.value = menuList.value.filter(
-    menu =>
-      menu.genreIds.some(id => selectedGenreIds.includes(id))
-      && menu.categoryIds.some(id => selectedCategoryIds.includes(id)),
+    (menu) =>
+      menu.genreIds.some((id) => selectedGenreIds.includes(id)) &&
+      menu.categoryIds.some((id) => selectedCategoryIds.includes(id))
   )
 
   // フィルタリングされたメニューを表示用に設定
@@ -187,8 +155,8 @@ watch(selectedCategoryNames, () => {
 const shuffleArrayElements = (nums: number[]): number[] => {
   // Fisher-Yatesアルゴリズム
   for (let i = nums.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [nums[i], nums[j]] = [nums[j], nums[i]]
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[nums[i], nums[j]] = [nums[j], nums[i]]
   }
   return nums
 }
@@ -200,7 +168,7 @@ const shuffleArrayElements = (nums: number[]): number[] => {
  */
 const findMenusByIds = (ids: number[]): MenuInfo[] => {
   return ids
-    .map(id => menuList.value.find(menu => menu.id === id))
+    .map((id) => menuList.value.find((menu) => menu.id === id))
     .filter((menu): menu is MenuInfo => menu !== undefined)
 }
 
@@ -210,8 +178,10 @@ const findMenusByIds = (ids: number[]): MenuInfo[] => {
  */
 const displayRandomMenus = (count: number = 0) => {
   // 条件絞り込み後のメニューがあればそれを使う
-  const menuIds
-    = filteredMenu.value.length !== 0 ? filteredMenu.value.map(menu => menu.id) : menuList.value.map(menu => menu.id)
+  const menuIds =
+    filteredMenu.value.length !== 0
+      ? filteredMenu.value.map((menu) => menu.id)
+      : menuList.value.map((menu) => menu.id)
   const shuffledMenuIds = shuffleArrayElements(menuIds)
   const randomMenus = findMenusByIds(shuffledMenuIds)
   // countが指定されていればその数だけ表示

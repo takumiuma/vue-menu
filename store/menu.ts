@@ -14,8 +14,7 @@ export const useMenuStore = defineStore('menu', () => {
     try {
       const response = await axios.get('/v1/menus')
       return response.data.menus
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Failed to fetch menus:', error)
       return []
     }
@@ -26,8 +25,7 @@ export const useMenuStore = defineStore('menu', () => {
     try {
       const response = await axios.post('/v1/menus', menu)
       return response.data.menu
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Failed to create menu:', error)
       return {} as menu
     }
@@ -38,8 +36,7 @@ export const useMenuStore = defineStore('menu', () => {
     try {
       const response = await axios.put(`/v1/menus/${menu.menuId}`, menu)
       return response.data.menu
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Failed to update menu:', error)
       return {} as menu
     }
@@ -49,8 +46,7 @@ export const useMenuStore = defineStore('menu', () => {
   const deleteMenu = async (menuId: number): Promise<void> => {
     try {
       await axios.delete(`/v1/menus/${menuId}`)
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Failed to delete menu:', error)
     }
   }
@@ -60,8 +56,7 @@ export const useMenuStore = defineStore('menu', () => {
     try {
       const response = await axios.patch(`/v1/menus/${menuId}/genres`, { genreIds })
       return response.data.menu
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Failed to update menu genre:', error)
       // TODO:空のmenuオブジェクトだと通信の成功が判断しづらいので、エラーをスローするか、返すかを検討する
       return {} as menu
@@ -73,8 +68,7 @@ export const useMenuStore = defineStore('menu', () => {
     try {
       const response = await axios.patch(`/v1/menus/${menuId}/categories`, { categoryIds })
       return response.data.menu
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Failed to update menu category:', error)
       // TODO:空のmenuオブジェクトだと通信の成功が判断しづらいので、エラーをスローするか、返すかを検討する
       return {} as menu
