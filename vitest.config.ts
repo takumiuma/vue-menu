@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitest/config'
 import { resolve } from 'path'
+// @ts-expect-error Module resolution issue with Nuxt's TypeScript config
 import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
@@ -15,11 +16,11 @@ export default defineConfig({
       '**/.{idea,git,cache,output,temp}/**',
       '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
       '**/tests/e2e/**', // Playwright E2E tests
-    ]
+    ],
   },
   resolve: {
     alias: {
-      '~': resolve(__dirname, '.')
-    }
-  }
+      '~': resolve(__dirname, '.'),
+    },
+  },
 })

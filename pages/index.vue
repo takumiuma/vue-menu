@@ -2,22 +2,46 @@
   <div>
     <v-container>
       <v-row>
-        <v-col><div class="text-h4 font-weight-bold">ランダムサーチ</div></v-col>
-        <v-col cols="auto">
-          <v-btn variant="flat" color="primary" @click="displayRandomMenus()"> 全てのメニューをランダムに表示 </v-btn>
+        <v-col>
+          <div class="text-h4 font-weight-bold">
+            ランダムサーチ
+          </div>
         </v-col>
         <v-col cols="auto">
-          <v-select v-model="count" label="何件" :items="[1, 2, 3, 4, 5]" variant="outlined"> </v-select>
+          <v-btn
+            variant="flat"
+            color="primary"
+            @click="displayRandomMenus()"
+          >
+            全てのメニューをランダムに表示
+          </v-btn>
         </v-col>
         <v-col cols="auto">
-          <v-btn variant="outlined" color="primary" @click="displayRandomMenus(count)">
+          <v-select
+            v-model="count"
+            label="何件"
+            :items="[1, 2, 3, 4, 5]"
+            variant="outlined"
+          />
+        </v-col>
+        <v-col cols="auto">
+          <v-btn
+            variant="outlined"
+            color="primary"
+            @click="displayRandomMenus(count)"
+          >
             ランダムに{{ count }}件表示
           </v-btn>
         </v-col>
       </v-row>
     </v-container>
     <v-container>
-      <v-data-table :headers="HEADERS" :items="displayedMenu" hover :loading="loading">
+      <v-data-table
+        :headers="HEADERS"
+        :items="displayedMenu"
+        hover
+        :loading="loading"
+      >
         <template #top>
           <v-combobox
             v-model="selectedGenreNames"
@@ -37,21 +61,33 @@
           />
         </template>
         <template #loading>
-          <v-skeleton-loader type="table-row@10"></v-skeleton-loader>
+          <v-skeleton-loader type="table-row@10" />
         </template>
         <template #item.shopSearch="{ item }">
-          <a :href="item.shopSearch" target="_blank">{{ `「${item.name} お店 近く」で検索` }}</a>
+          <a
+            :href="item.shopSearch"
+            target="_blank"
+          >{{ `「${item.name} お店 近く」で検索` }}</a>
         </template>
         <template #item.recipeSearch="{ item }">
-          <a :href="item.recipeSearch" target="_blank">{{ `「${item.name}のレシピ」を検索` }}</a>
+          <a
+            :href="item.recipeSearch"
+            target="_blank"
+          >{{ `「${item.name}のレシピ」を検索` }}</a>
         </template>
         <template #item.genreIds="{ item }">
-          <v-chip v-for="genreId in item.genreIds">
+          <v-chip
+            v-for="genreId in item.genreIds"
+            :key="genreId"
+          >
             {{ GENRES.find((genre) => genre.id === genreId)?.name }}
           </v-chip>
         </template>
         <template #item.categoryIds="{ item }">
-          <v-chip v-for="categoryId in item.categoryIds">
+          <v-chip
+            v-for="categoryId in item.categoryIds"
+            :key="categoryId"
+          >
             {{ CATEGORIES.find((category) => category.id === categoryId)?.name }}
           </v-chip>
         </template>
@@ -61,11 +97,16 @@
 </template>
 
 <script setup lang="ts">
-import { useMenuService, type MenuInfo } from '~/composables/useMenuService';
-import { useLoadingOverlayStore } from '~/composables/useLoadingOverlayService';
-import { cloneDeep } from 'lodash';
+import { useMenuService, type MenuInfo } from '~/composables/useMenuService'
+import { useLoadingOverlayStore } from '~/composables/useLoadingOverlayService'
+import { cloneDeep } from 'lodash'
 
-const { menuList } = useMenuService();
+// Set page title for SEO and testing
+useHead({
+  title: 'Vue Menu - ランダムサーチ',
+})
+
+const { menuList } = useMenuService()
 
 const HEADERS = [
   { title: 'メニュー', value: 'name' },
@@ -73,7 +114,7 @@ const HEADERS = [
   { title: 'クックパッドでレシピを検索', value: 'recipeSearch' },
   { title: 'ジャンル', value: 'genreIds' },
   { title: 'カテゴリ', value: 'categoryIds' },
-];
+]
 const GENRES = [
   { id: 1, name: '和食' },
   { id: 2, name: '中華料理' },
@@ -81,7 +122,7 @@ const GENRES = [
   { id: 4, name: '韓国料理' },
   { id: 5, name: 'ファーストフード' },
   { id: 6, name: 'その他' },
-];
+]
 const CATEGORIES = [
   { id: 1, name: '肉' },
   { id: 2, name: '魚' },
@@ -91,15 +132,15 @@ const CATEGORIES = [
   { id: 6, name: 'パン' },
   { id: 7, name: 'スープ・汁物' },
   { id: 8, name: 'その他' },
-];
+]
 
-const displayedMenu = ref<MenuInfo[]>([]); // v-data-tableに表示するメニュー
-const filteredMenu = ref<MenuInfo[]>([]); // カテゴリとジャンルの条件絞り込み後メニュー（displayedMenuのシャローコピー）
-const count = ref<number>(3); // 表示するメニューの数
-const selectedGenreNames = ref<string[]>(GENRES.map((genre) => genre.name)); // 選択中のジャンル名
-const selectedCategoryNames = ref<string[]>(CATEGORIES.map((category) => category.name)); // 選択中のカテゴリ名
+const displayedMenu = ref<MenuInfo[]>([]) // v-data-tableに表示するメニュー
+const filteredMenu = ref<MenuInfo[]>([]) // カテゴリとジャンルの条件絞り込み後メニュー（displayedMenuのシャローコピー）
+const count = ref<number>(3) // 表示するメニューの数
+const selectedGenreNames = ref<string[]>(GENRES.map(genre => genre.name)) // 選択中のジャンル名
+const selectedCategoryNames = ref<string[]>(CATEGORIES.map(category => category.name)) // 選択中のカテゴリ名
 
-const loading = ref<boolean>(false);
+const loading = ref<boolean>(false)
 
 /**
  * 選択されたジャンル名とカテゴリ名に基づいてメニューをフィルタリングします。
@@ -111,33 +152,33 @@ const loading = ref<boolean>(false);
  */
 const filteredMenus = () => {
   // 選択されたジャンル名に対応するジャンルIDを取得
-  const selectedGenreIds = GENRES.filter((genre) => selectedGenreNames.value.includes(genre.name)).map(
-    (genre) => genre.id
-  );
+  const selectedGenreIds = GENRES.filter(genre => selectedGenreNames.value.includes(genre.name)).map(
+    genre => genre.id,
+  )
 
   // 選択されたカテゴリ名に対応するカテゴリIDを取得
-  const selectedCategoryIds = CATEGORIES.filter((category) => selectedCategoryNames.value.includes(category.name)).map(
-    (category) => category.id
-  );
+  const selectedCategoryIds = CATEGORIES.filter(category => selectedCategoryNames.value.includes(category.name)).map(
+    category => category.id,
+  )
 
   // メニューをフィルタリング
   filteredMenu.value = menuList.value.filter(
-    (menu) =>
-      menu.genreIds.some((id) => selectedGenreIds.includes(id)) &&
-      menu.categoryIds.some((id) => selectedCategoryIds.includes(id))
-  );
+    menu =>
+      menu.genreIds.some(id => selectedGenreIds.includes(id))
+      && menu.categoryIds.some(id => selectedCategoryIds.includes(id)),
+  )
 
   // フィルタリングされたメニューを表示用に設定
   // 深い要素は変更しないので、スプレッド構文でコピー
-  displayedMenu.value = [...filteredMenu.value];
-};
+  displayedMenu.value = [...filteredMenu.value]
+}
 
 watch(selectedGenreNames, () => {
-  filteredMenus();
-});
+  filteredMenus()
+})
 watch(selectedCategoryNames, () => {
-  filteredMenus();
-});
+  filteredMenus()
+})
 
 /**
  * 数値配列をシャッフルして返します。
@@ -147,10 +188,10 @@ const shuffleArrayElements = (nums: number[]): number[] => {
   // Fisher-Yatesアルゴリズム
   for (let i = nums.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [nums[i], nums[j]] = [nums[j], nums[i]];
+    [nums[i], nums[j]] = [nums[j], nums[i]]
   }
-  return nums;
-};
+  return nums
+}
 
 /**
  * 指定されたIDのメニューを検索して返します。
@@ -159,9 +200,9 @@ const shuffleArrayElements = (nums: number[]): number[] => {
  */
 const findMenusByIds = (ids: number[]): MenuInfo[] => {
   return ids
-    .map((id) => menuList.value.find((menu) => menu.id === id))
-    .filter((menu): menu is MenuInfo => menu !== undefined);
-};
+    .map(id => menuList.value.find(menu => menu.id === id))
+    .filter((menu): menu is MenuInfo => menu !== undefined)
+}
 
 /**
  * ランダムにメニューを表示します。条件絞り込み後のメニューがあればそれを使用します。
@@ -169,21 +210,21 @@ const findMenusByIds = (ids: number[]): MenuInfo[] => {
  */
 const displayRandomMenus = (count: number = 0) => {
   // 条件絞り込み後のメニューがあればそれを使う
-  const menuIds =
-    filteredMenu.value.length !== 0 ? filteredMenu.value.map((menu) => menu.id) : menuList.value.map((menu) => menu.id);
-  const shuffledMenuIds = shuffleArrayElements(menuIds);
-  const randomMenus = findMenusByIds(shuffledMenuIds);
+  const menuIds
+    = filteredMenu.value.length !== 0 ? filteredMenu.value.map(menu => menu.id) : menuList.value.map(menu => menu.id)
+  const shuffledMenuIds = shuffleArrayElements(menuIds)
+  const randomMenus = findMenusByIds(shuffledMenuIds)
   // countが指定されていればその数だけ表示
-  displayedMenu.value = count ? randomMenus.slice(0, count) : randomMenus;
-};
+  displayedMenu.value = count ? randomMenus.slice(0, count) : randomMenus
+}
 
 onMounted(async () => {
-  useLoadingOverlayStore().startLoading();
-  loading.value = true;
-  await useMenuService().getMenuInfoList();
+  useLoadingOverlayStore().startLoading()
+  loading.value = true
+  await useMenuService().getMenuInfoList()
   // メニューリストを表示用にコピー。元データは保持。
-  displayedMenu.value = cloneDeep(menuList.value);
-  useLoadingOverlayStore().endLoading();
-  loading.value = false;
-});
+  displayedMenu.value = cloneDeep(menuList.value)
+  useLoadingOverlayStore().endLoading()
+  loading.value = false
+})
 </script>

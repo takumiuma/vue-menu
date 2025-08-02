@@ -2,15 +2,15 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ master, develop ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ master, develop ]
     types: [ opened, synchronize, reopened, ready_for_review ]
 
 jobs:
   lint:
     name: ESLint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
     - name: Checkout code
@@ -19,18 +19,38 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
         cache: 'yarn'
 
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
+    - name: Install dependencies with retry
+      run: |
+        # Configure yarn for better network handling
+        yarn config set network-timeout 300000
+        yarn config set registry https://registry.npmjs.org/
+        
+        # Retry installation up to 3 times
+        for i in {1..3}; do
+          echo "Installation attempt $i..."
+          if yarn install --frozen-lockfile; then
+            echo "Installation successful on attempt $i"
+            break
+          else
+            echo "Installation failed on attempt $i"
+            if [ $i -eq 3 ]; then
+              echo "All installation attempts failed"
+              exit 1
+            fi
+            echo "Waiting 10 seconds before retry..."
+            sleep 10
+          fi
+        done
 
     - name: Run ESLint
       run: yarn lint
 
   type-check:
     name: TypeScript Type Check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
     - name: Checkout code
@@ -39,18 +59,38 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
         cache: 'yarn'
 
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
+    - name: Install dependencies with retry
+      run: |
+        # Configure yarn for better network handling
+        yarn config set network-timeout 300000
+        yarn config set registry https://registry.npmjs.org/
+        
+        # Retry installation up to 3 times
+        for i in {1..3}; do
+          echo "Installation attempt $i..."
+          if yarn install --frozen-lockfile; then
+            echo "Installation successful on attempt $i"
+            break
+          else
+            echo "Installation failed on attempt $i"
+            if [ $i -eq 3 ]; then
+              echo "All installation attempts failed"
+              exit 1
+            fi
+            echo "Waiting 10 seconds before retry..."
+            sleep 10
+          fi
+        done
 
     - name: Run vue-tsc type check
       run: yarn type-check
 
   unit-tests:
     name: Unit Tests (Vitest)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
     - name: Checkout code
@@ -59,18 +99,38 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
         cache: 'yarn'
 
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
+    - name: Install dependencies with retry
+      run: |
+        # Configure yarn for better network handling
+        yarn config set network-timeout 300000
+        yarn config set registry https://registry.npmjs.org/
+        
+        # Retry installation up to 3 times
+        for i in {1..3}; do
+          echo "Installation attempt $i..."
+          if yarn install --frozen-lockfile; then
+            echo "Installation successful on attempt $i"
+            break
+          else
+            echo "Installation failed on attempt $i"
+            if [ $i -eq 3 ]; then
+              echo "All installation attempts failed"
+              exit 1
+            fi
+            echo "Waiting 10 seconds before retry..."
+            sleep 10
+          fi
+        done
 
     - name: Run unit tests
       run: yarn test:run
 
   security:
     name: Security Audit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
     - name: Checkout code
@@ -79,11 +139,31 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
         cache: 'yarn'
 
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
+    - name: Install dependencies with retry
+      run: |
+        # Configure yarn for better network handling
+        yarn config set network-timeout 300000
+        yarn config set registry https://registry.npmjs.org/
+        
+        # Retry installation up to 3 times
+        for i in {1..3}; do
+          echo "Installation attempt $i..."
+          if yarn install --frozen-lockfile; then
+            echo "Installation successful on attempt $i"
+            break
+          else
+            echo "Installation failed on attempt $i"
+            if [ $i -eq 3 ]; then
+              echo "All installation attempts failed"
+              exit 1
+            fi
+            echo "Waiting 10 seconds before retry..."
+            sleep 10
+          fi
+        done
 
     - name: Run yarn audit
       run: yarn audit --level moderate || true
@@ -92,7 +172,7 @@ jobs:
 
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
     - name: Checkout code
@@ -101,25 +181,38 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
         cache: 'yarn'
 
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
+    - name: Install dependencies with retry
+      run: |
+        # Configure yarn for better network handling
+        yarn config set network-timeout 300000
+        yarn config set registry https://registry.npmjs.org/
+        
+        # Retry installation up to 3 times
+        for i in {1..3}; do
+          echo "Installation attempt $i..."
+          if yarn install --frozen-lockfile; then
+            echo "Installation successful on attempt $i"
+            break
+          else
+            echo "Installation failed on attempt $i"
+            if [ $i -eq 3 ]; then
+              echo "All installation attempts failed"
+              exit 1
+            fi
+            echo "Waiting 10 seconds before retry..."
+            sleep 10
+          fi
+        done
 
     - name: Build application
       run: yarn build
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: dist
-        path: .output
-        retention-days: 1
-
   e2e-tests:
     name: Playwright E2E Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
     - name: Checkout code
@@ -128,14 +221,40 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
         cache: 'yarn'
 
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
+    - name: Install dependencies with retry
+      run: |
+        # Configure yarn for better network handling
+        yarn config set network-timeout 300000
+        yarn config set registry https://registry.npmjs.org/
+        
+        # Retry installation up to 3 times
+        for i in {1..3}; do
+          echo "Installation attempt $i..."
+          if yarn install --frozen-lockfile; then
+            echo "Installation successful on attempt $i"
+            break
+          else
+            echo "Installation failed on attempt $i"
+            if [ $i -eq 3 ]; then
+              echo "All installation attempts failed"
+              exit 1
+            fi
+            echo "Waiting 10 seconds before retry..."
+            sleep 10
+          fi
+        done
+
+    - name: Build application
+      run: yarn build
 
     - name: Install Playwright browsers
       run: yarn test:e2e:install
+
+    - name: Install Playwright system dependencies
+      run: npx playwright install-deps
 
     - name: Run Playwright tests
       run: yarn test:e2e
@@ -150,7 +269,7 @@ jobs:
 
   codeql:
     name: CodeQL Security Analysis
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       actions: read
       contents: read
@@ -168,11 +287,31 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
         cache: 'yarn'
 
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
+    - name: Install dependencies with retry
+      run: |
+        # Configure yarn for better network handling
+        yarn config set network-timeout 300000
+        yarn config set registry https://registry.npmjs.org/
+        
+        # Retry installation up to 3 times
+        for i in {1..3}; do
+          echo "Installation attempt $i..."
+          if yarn install --frozen-lockfile; then
+            echo "Installation successful on attempt $i"
+            break
+          else
+            echo "Installation failed on attempt $i"
+            if [ $i -eq 3 ]; then
+              echo "All installation attempts failed"
+              exit 1
+            fi
+            echo "Waiting 10 seconds before retry..."
+            sleep 10
+          fi
+        done
 
     - name: Build for analysis
       run: yarn build

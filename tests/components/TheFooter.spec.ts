@@ -7,11 +7,11 @@ describe('TheFooter', () => {
     const wrapper = mount(TheFooter, {
       global: {
         stubs: {
-          'v-footer': true
-        }
-      }
+          'v-footer': true,
+        },
+      },
     })
-    
+
     expect(wrapper.vm).toBeTruthy()
   })
 })
