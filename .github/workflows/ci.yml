@@ -209,24 +209,10 @@ jobs:
 
     - name: Build application
       run: yarn build
-    
-    - name: List .output directory
-      run: |
-        ls -l .output || echo ".output not found"
-        ls -l .output/server || echo ".output/server not found"
-        ls -l .output/public || echo ".output/public not found"
-
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: dist
-        path: .output
-        retention-days: 1
 
   e2e-tests:
     name: Playwright E2E Tests
     runs-on: ubuntu-latest
-    needs: build
 
     steps:
     - name: Checkout code
@@ -261,17 +247,14 @@ jobs:
           fi
         done
 
+    - name: Build application
+      run: yarn build
+
     - name: Install Playwright browsers
       run: yarn test:e2e:install
 
     - name: Install Playwright system dependencies
       run: npx playwright install-deps
-
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: dist
-        path: .output
 
     - name: Run Playwright tests
       run: yarn test:e2e
