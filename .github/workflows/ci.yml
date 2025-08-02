@@ -255,17 +255,17 @@ jobs:
           fi
         done
 
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: dist
-        path: .output
-
     - name: Install Playwright browsers
       run: yarn test:e2e:install
 
     - name: Install Playwright system dependencies
       run: npx playwright install-deps
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: dist
+        path: .output
 
     - name: Run Playwright tests
       run: yarn test:e2e
