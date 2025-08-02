@@ -1,7 +1,40 @@
 import { test, expect } from '@playwright/test'
 
+// Mock menu data for E2E tests
+const mockMenuData = {
+  menus: [
+    {
+      menuId: 1,
+      menuName: 'ハンバーガー',
+      genreIds: [5],
+      categoryIds: [1],
+    },
+    {
+      menuId: 2,
+      menuName: 'ラーメン',
+      genreIds: [1],
+      categoryIds: [5],
+    },
+    {
+      menuId: 3,
+      menuName: 'パスタ',
+      genreIds: [3],
+      categoryIds: [5],
+    },
+  ],
+}
+
 test.describe('Smoke Tests', () => {
   test('homepage loads without errors', async ({ page }) => {
+    // Mock API responses to avoid backend dependency
+    await page.route('**/v1/menus', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(mockMenuData),
+      })
+    })
+
     // Navigate to the homepage
     await page.goto('/')
 
@@ -37,6 +70,15 @@ test.describe('Smoke Tests', () => {
   })
 
   test('menu list page loads without errors', async ({ page }) => {
+    // Mock API responses to avoid backend dependency
+    await page.route('**/v1/menus', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(mockMenuData),
+      })
+    })
+
     // Navigate to the menu list page
     await page.goto('/menuList')
 
@@ -51,6 +93,15 @@ test.describe('Smoke Tests', () => {
   })
 
   test('navigation between pages works', async ({ page }) => {
+    // Mock API responses for both pages
+    await page.route('**/v1/menus', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(mockMenuData),
+      })
+    })
+
     await page.goto('/')
 
     // Navigate to menu list using the navigation
