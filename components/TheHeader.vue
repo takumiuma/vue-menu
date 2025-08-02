@@ -1,10 +1,7 @@
 <template>
   <v-app-bar color="primary">
     <template #prepend>
-      <v-app-bar-nav-icon
-        variant="text"
-        @click.stop="drawer = !drawer"
-      />
+      <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer" />
     </template>
     <v-app-bar-title><v-icon icon="$vuetify" />{{ TITLE }}</v-app-bar-title>
   </v-app-bar>
@@ -14,33 +11,18 @@
     temporary
   >
     <v-list>
-      <v-list-item
-        v-for="item in ITEMS"
-        :key="item.title"
-        :to="item.link"
-      >
+      <v-list-item v-for="item in ITEMS" :key="item.title" :to="item.link">
         <v-icon>{{ item.icon }}</v-icon>
         {{ item.title }}
       </v-list-item>
     </v-list>
     <template #append>
-      <div
-        v-if="prepared"
-        class="pa-2"
-      >
-        <v-btn
-          v-if="!isAuthenticated"
-          block
-          @click="login"
-        >
+      <div v-if="prepared" class="pa-2">
+        <v-btn v-if="!isAuthenticated" block @click="login">
           <v-icon>{{ 'mdi-login' }}</v-icon>
           Login
         </v-btn>
-        <v-btn
-          v-if="isAuthenticated"
-          block
-          @click="logout"
-        >
+        <v-btn v-if="isAuthenticated" block @click="logout">
           <v-icon>{{ 'mdi-logout' }}</v-icon>
           Logout
         </v-btn>
@@ -75,8 +57,8 @@ onBeforeMount(async () => {
   })
 
   if (
-    (window.location.search.includes('code=') && window.location.search.includes('state='))
-    || window.location.search.includes('error=')
+    (window.location.search.includes('code=') && window.location.search.includes('state=')) ||
+    window.location.search.includes('error=')
   ) {
     // 認証成功しているか確認
     await auth0.value.handleRedirectCallback()
