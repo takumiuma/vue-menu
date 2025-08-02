@@ -209,6 +209,12 @@ jobs:
 
     - name: Build application
       run: yarn build
+    
+    - name: List .output directory
+      run: |
+        ls -l .output || echo ".output not found"
+        ls -l .output/server || echo ".output/server not found"
+        ls -l .output/public || echo ".output/public not found"
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
