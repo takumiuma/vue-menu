@@ -6,6 +6,9 @@
           <div class="text-h4 font-weight-bold">
             メニューリスト
           </div>
+          <div class="text-body-1 text-grey-600 mt-1">
+            全件表示 ({{ displayedMenu.length }}件)
+          </div>
         </v-col>
         <v-col cols="auto">
           <v-btn
@@ -243,7 +246,9 @@
 import type { menu } from '~/store/menu'
 import { useMenuService, type MenuInfo } from '~/composables/useMenuService'
 import { useLoadingOverlayStore } from '~/composables/useLoadingOverlayService'
-import { cloneDeep } from 'lodash'
+import pkg from 'lodash'
+
+const { cloneDeep } = pkg
 
 // Set page title for SEO and testing
 useHead({
