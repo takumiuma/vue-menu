@@ -26,7 +26,7 @@ const getMenuInfoList = async (): Promise<void> => {
       recipeSearch: `https://cookpad.com/search/${menu.menuName}`,
       genreIds: menu.genreIds,
       categoryIds: menu.categoryIds,
-    }),
+    })
   )
 }
 
@@ -58,7 +58,7 @@ const updateMenuGenre = async (menuId: number, genreIds: number[]): Promise<menu
   const resultMenu = await useMenuStore().updateMenuGenre(menuId, genreIds)
   // メニュー情報リストを更新
   if (Object.keys(resultMenu).length > 0) {
-    const index = menuList.value.findIndex(menu => menu.id === resultMenu.menuId)
+    const index = menuList.value.findIndex((menu) => menu.id === resultMenu.menuId)
     if (index !== -1) {
       menuList.value[index].genreIds = resultMenu.genreIds
     }
@@ -72,7 +72,7 @@ const updateMenuCategory = async (menuId: number, categoryIds: number[]): Promis
   const resultMenu = await useMenuStore().updateMenuCategory(menuId, categoryIds)
   // メニュー情報リストを更新
   if (Object.keys(resultMenu).length > 0) {
-    const index = menuList.value.findIndex(menu => menu.id === resultMenu.menuId)
+    const index = menuList.value.findIndex((menu) => menu.id === resultMenu.menuId)
     if (index !== -1) {
       menuList.value[index].categoryIds = resultMenu.categoryIds
     }

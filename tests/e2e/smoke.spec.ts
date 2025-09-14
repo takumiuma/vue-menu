@@ -61,10 +61,9 @@ test.describe('Smoke Tests', () => {
     await page.waitForLoadState('networkidle')
 
     // Assert no console errors (allowing some expected warnings)
-    const criticalErrors = errors.filter(error =>
-      !error.includes('warning')
-      && !error.includes('deprecated')
-      && !error.includes('favicon'),
+    const criticalErrors = errors.filter(
+      (error) =>
+        !error.includes('warning') && !error.includes('deprecated') && !error.includes('favicon')
     )
     expect(criticalErrors).toHaveLength(0)
   })
