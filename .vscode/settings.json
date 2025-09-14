@@ -51,5 +51,6 @@
   // 日本語開発者向けの追加設定
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
-  "editor.detectIndentation": false
+  "editor.detectIndentation": false,
+  "kiroAgent.configureMCP": "Disabled"
 }
