@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useFavoriteStore } from '~/store/favorite'
 import type { FavoriteWithMenu } from '~/composables/useFavoriteService'
+import type { menu } from '~/store/menu'
 
 // Mock the useFavoriteService
 const mockGetFavorites = vi.fn()
@@ -174,7 +175,7 @@ describe('useFavoriteStore', () => {
 
     it('メニュー情報が見つからない場合は追加しない', async () => {
       const mockResponse = { favoriteId: 123 }
-      const mockMenus: never[] = []
+      const mockMenus: menu[] = []
 
       mockAddFavorite.mockResolvedValueOnce(mockResponse)
       mockGetMenus.mockResolvedValueOnce(mockMenus)

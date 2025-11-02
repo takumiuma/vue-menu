@@ -7,7 +7,7 @@ export interface Favorite {
 
 export interface FavoriteWithMenu {
   favoriteId: number
-  userId: number
+  userId?: number
   menuId: number
   menuName: string
   genreIds: number[]

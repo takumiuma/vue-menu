@@ -43,7 +43,6 @@ export const useFavoriteStore = defineStore('favorite', () => {
       if (menuInfo) {
         addLocalFavorite({
           favoriteId: response.favoriteId,
-          userId: 0, // 不要だが型のため
           menuId: menuId,
           menuName: menuInfo.menuName,
           genreIds: menuInfo.genreIds,
