@@ -5,6 +5,16 @@ export interface Favorite {
   menuId: number
 }
 
+export interface FavoriteWithMenu {
+  favoriteId: number
+  userId: number
+  menuId: number
+  menuName: string
+  genreIds: number[]
+  categoryIds: number[]
+  createdAt: string
+}
+
 export const useFavoriteService = () => {
   const { axios } = useAxiosService()
 
@@ -39,7 +49,7 @@ export const useFavoriteService = () => {
     }
   }
 
-  const getFavorites = async (token: string): Promise<Favorite[]> => {
+  const getFavorites = async (token: string): Promise<FavoriteWithMenu[]> => {
     try {
       const response = await axios.get('/v1/favorites', {
         headers: {
