@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import { defineStore } from 'pinia'
-import { ref, computed, readonly } from 'vue'
+import { ref, computed, readonly, onMounted } from 'vue'
 
 // Mock Nuxt composables and runtime
 // @ts-expect-error Overriding Nuxt auto-imports for testing
@@ -23,6 +23,15 @@ globalThis.ref = ref
 globalThis.computed = computed
 // @ts-expect-error Overriding Nuxt auto-imports for testing
 globalThis.readonly = readonly
+// @ts-expect-error Overriding Nuxt auto-imports for testing
+globalThis.onMounted = onMounted
+// @ts-expect-error Overriding Nuxt auto-imports for testing
+globalThis.useRuntimeConfig = vi.fn(() => ({
+  public: {
+    AUTH0_DOMAIN: 'test-domain',
+    AUTH0_CLIENT_ID: 'test-client-id',
+  },
+}))
 
 // Mock console to reduce noise in tests
 global.console = {
