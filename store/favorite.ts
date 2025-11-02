@@ -1,5 +1,14 @@
-import { useFavoriteService, type FavoriteWithMenu } from '~/composables/useFavoriteService'
+import { useFavoriteService } from '~/composables/useFavoriteService'
 import { useMenuStore } from '~/store/menu'
+
+// お気に入りの詳細情報を含む型定義（ストア内部で使用）
+export interface FavoriteWithMenu {
+  favoriteId: number
+  menuId: number
+  menuName: string
+  genreIds: number[]
+  categoryIds: number[]
+}
 
 export const useFavoriteStore = defineStore('favorite', () => {
   const favorites = ref<FavoriteWithMenu[]>([])
@@ -21,8 +30,28 @@ export const useFavoriteStore = defineStore('favorite', () => {
   const loadFavorites = async (token: string): Promise<void> => {
     try {
       const { getFavorites } = useFavoriteService()
-      const data = await getFavorites(token)
-      favorites.value = data
+      const menuStore = useMenuStore()
+
+      // お気に入りリストとメニューリストを取得
+      const favoritesData = await getFavorites(token)
+      const menus = await menuStore.getMenus()
+
+      // お気に入りとメニュー情報を結合
+      favorites.value = favoritesData
+        .map((fav) => {
+          const menu = menus.find((m) => m.menuId === fav.menuId)
+          if (menu) {
+            return {
+              favoriteId: fav.favoriteId,
+              menuId: fav.menuId,
+              menuName: menu.menuName,
+              genreIds: menu.genreIds,
+              categoryIds: menu.categoryIds,
+            }
+          }
+          return null
+        })
+        .filter((item): item is FavoriteWithMenu => item !== null)
     } catch (error) {
       console.error('Failed to load favorites:', error)
       throw error
@@ -47,7 +76,6 @@ export const useFavoriteStore = defineStore('favorite', () => {
           menuName: menuInfo.menuName,
           genreIds: menuInfo.genreIds,
           categoryIds: menuInfo.categoryIds,
-          createdAt: new Date().toISOString(),
         })
       }
     } catch (error) {

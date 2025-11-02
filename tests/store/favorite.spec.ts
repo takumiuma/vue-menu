@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { useFavoriteStore } from '~/store/favorite'
-import type { FavoriteWithMenu } from '~/composables/useFavoriteService'
+import { useFavoriteStore, type FavoriteWithMenu } from '~/store/favorite'
+import type { Favorite } from '~/composables/useFavoriteService'
 import type { menu } from '~/store/menu'
 
 // Mock the useFavoriteService
@@ -52,21 +52,17 @@ describe('useFavoriteStore', () => {
       const mockFavorites: FavoriteWithMenu[] = [
         {
           favoriteId: 1,
-          userId: 100,
           menuId: 10,
           menuName: 'カレー',
           genreIds: [1, 2],
           categoryIds: [3],
-          createdAt: '2024-01-01T00:00:00Z',
         },
         {
           favoriteId: 2,
-          userId: 100,
           menuId: 20,
           menuName: 'ラーメン',
           genreIds: [2],
           categoryIds: [4],
-          createdAt: '2024-01-02T00:00:00Z',
         },
       ]
 
@@ -84,12 +80,10 @@ describe('useFavoriteStore', () => {
       const store = useFavoriteStore()
       store.addLocalFavorite({
         favoriteId: 1,
-        userId: 100,
         menuId: 10,
         menuName: 'カレー',
         genreIds: [1],
         categoryIds: [2],
-        createdAt: '2024-01-01T00:00:00Z',
       })
 
       expect(store.isFavorite(10)).toBe(true)
@@ -102,12 +96,10 @@ describe('useFavoriteStore', () => {
       const store = useFavoriteStore()
       store.addLocalFavorite({
         favoriteId: 123,
-        userId: 100,
         menuId: 10,
         menuName: 'カレー',
         genreIds: [1],
         categoryIds: [2],
-        createdAt: '2024-01-01T00:00:00Z',
       })
 
       expect(store.getFavoriteId(10)).toBe(123)
@@ -121,24 +113,39 @@ describe('useFavoriteStore', () => {
 
   describe('loadFavorites', () => {
     it('お気に入りリストを正常に読み込む', async () => {
-      const mockFavorites: FavoriteWithMenu[] = [
+      const mockFavoritesApi: Favorite[] = [
         {
           favoriteId: 1,
-          userId: 100,
+          menuId: 10,
+        },
+      ]
+      const mockMenus = [
+        {
           menuId: 10,
           menuName: 'カレー',
           genreIds: [1],
           categoryIds: [2],
-          createdAt: '2024-01-01T00:00:00Z',
         },
       ]
-      mockGetFavorites.mockResolvedValueOnce(mockFavorites)
+      const expectedFavorites: FavoriteWithMenu[] = [
+        {
+          favoriteId: 1,
+          menuId: 10,
+          menuName: 'カレー',
+          genreIds: [1],
+          categoryIds: [2],
+        },
+      ]
+
+      mockGetFavorites.mockResolvedValueOnce(mockFavoritesApi)
+      mockGetMenus.mockResolvedValueOnce(mockMenus)
 
       const store = useFavoriteStore()
       await store.loadFavorites(mockToken)
 
       expect(mockGetFavorites).toHaveBeenCalledWith(mockToken)
-      expect(store.favorites).toEqual(mockFavorites)
+      expect(mockGetMenus).toHaveBeenCalled()
+      expect(store.favorites).toEqual(expectedFavorites)
     })
 
     it('API呼び出し失敗時にエラーをスローする', async () => {
@@ -202,12 +209,10 @@ describe('useFavoriteStore', () => {
       const store = useFavoriteStore()
       store.addLocalFavorite({
         favoriteId: 123,
-        userId: 100,
         menuId: 10,
         menuName: 'カレー',
         genreIds: [1],
         categoryIds: [2],
-        createdAt: '2024-01-01T00:00:00Z',
       })
 
       expect(store.isFavorite(10)).toBe(true)
@@ -220,28 +225,39 @@ describe('useFavoriteStore', () => {
 
     it('API呼び出し失敗時にエラーをスローしロールバックする', async () => {
       const mockError = new Error('API Error')
-      const mockFavorites: FavoriteWithMenu[] = [
+      const mockFavoritesApi: Favorite[] = [
         {
           favoriteId: 123,
-          userId: 100,
+          menuId: 10,
+        },
+      ]
+      const mockMenus = [
+        {
           menuId: 10,
           menuName: 'カレー',
           genreIds: [1],
           categoryIds: [2],
-          createdAt: '2024-01-01T00:00:00Z',
         },
       ]
 
       mockRemoveFavorite.mockRejectedValueOnce(mockError)
-      mockGetFavorites.mockResolvedValueOnce(mockFavorites)
+      mockGetFavorites.mockResolvedValueOnce(mockFavoritesApi)
+      mockGetMenus.mockResolvedValueOnce(mockMenus)
 
       const store = useFavoriteStore()
-      store.addLocalFavorite(mockFavorites[0])
+      store.addLocalFavorite({
+        favoriteId: 123,
+        menuId: 10,
+        menuName: 'カレー',
+        genreIds: [1],
+        categoryIds: [2],
+      })
 
       await expect(store.removeFromFavorites(123, mockToken)).rejects.toThrow('API Error')
 
       // ロールバックのためloadFavoritesが呼ばれることを確認
       expect(mockGetFavorites).toHaveBeenCalledWith(mockToken)
+      expect(mockGetMenus).toHaveBeenCalled()
     })
   })
 
@@ -250,12 +266,10 @@ describe('useFavoriteStore', () => {
       const store = useFavoriteStore()
       const favorite: FavoriteWithMenu = {
         favoriteId: 1,
-        userId: 100,
         menuId: 10,
         menuName: 'カレー',
         genreIds: [1],
         categoryIds: [2],
-        createdAt: '2024-01-01T00:00:00Z',
       }
 
       store.addLocalFavorite(favorite)
@@ -270,12 +284,10 @@ describe('useFavoriteStore', () => {
       const store = useFavoriteStore()
       const favorite: FavoriteWithMenu = {
         favoriteId: 123,
-        userId: 100,
         menuId: 10,
         menuName: 'カレー',
         genreIds: [1],
         categoryIds: [2],
-        createdAt: '2024-01-01T00:00:00Z',
       }
 
       store.addLocalFavorite(favorite)
@@ -289,12 +301,10 @@ describe('useFavoriteStore', () => {
       const store = useFavoriteStore()
       store.addLocalFavorite({
         favoriteId: 123,
-        userId: 100,
         menuId: 10,
         menuName: 'カレー',
         genreIds: [1],
         categoryIds: [2],
-        createdAt: '2024-01-01T00:00:00Z',
       })
 
       store.removeLocalFavorite(999)
