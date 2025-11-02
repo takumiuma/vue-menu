@@ -412,7 +412,9 @@ onMounted(async () => {
 
 const onFavoriteChanged = (isFavorite: boolean) => {
   // お気に入り状態が変更されたときの処理
-  // 必要に応じて、メニュー表示の更新やログ出力などを行う
-  console.log('Favorite status changed:', isFavorite)
+  // 将来的には、メニュー表示の更新やUI反映などを実装予定
+  if (process.env.NODE_ENV === 'development') {
+    console.info('Favorite status changed:', isFavorite)
+  }
 }
 </script>
