@@ -59,12 +59,21 @@
             {{ CATEGORIES.find((category) => category.id === categoryId)?.name }}
           </v-chip>
         </template>
+        <template #item.favorite="{ item }">
+          <FavoriteButton
+            v-if="isAuthenticated"
+            :menu-id="item.id"
+            @favorite-changed="(isFavorite) => onFavoriteChanged(item.id, isFavorite)"
+          />
+        </template>
       </v-data-table>
     </v-container>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { Auth0Client } from '@auth0/auth0-spa-js'
+import { createAuth0Client } from '@auth0/auth0-spa-js'
 import { useMenuService, type MenuInfo } from '~/composables/useMenuService'
 import { useLoadingOverlayStore } from '~/composables/useLoadingOverlayService'
 import { cloneDeep } from 'lodash'
@@ -74,6 +83,12 @@ useHead({
   title: 'Vue Menu - ランダムサーチ',
 })
 
+const config = useRuntimeConfig()
+
+// Auth0クライアントの初期化
+const auth0 = ref<Auth0Client | null>(null)
+const isAuthenticated = ref(false)
+
 const { menuList } = useMenuService()
 
 const HEADERS = [
@@ -82,6 +97,7 @@ const HEADERS = [
   { title: 'クックパッドでレシピを検索', value: 'recipeSearch' },
   { title: 'ジャンル', value: 'genreIds' },
   { title: 'カテゴリ', value: 'categoryIds' },
+  { title: 'お気に入り', value: 'favorite', sortable: false },
 ]
 const GENRES = [
   { id: 1, name: '和食' },
@@ -191,10 +207,23 @@ const displayRandomMenus = (count: number = 0) => {
 onMounted(async () => {
   useLoadingOverlayStore().startLoading()
   loading.value = true
+
+  // Auth0クライアントの初期化
+  auth0.value = await createAuth0Client({
+    domain: config.public.AUTH0_DOMAIN as string,
+    clientId: config.public.AUTH0_CLIENT_ID as string,
+  })
+  isAuthenticated.value = await auth0.value.isAuthenticated()
+
   await useMenuService().getMenuInfoList()
   // メニューリストを表示用にコピー。元データは保持。
   displayedMenu.value = cloneDeep(menuList.value)
   useLoadingOverlayStore().endLoading()
   loading.value = false
 })
+
+// お気に入り状態が変更された時のハンドラー
+const onFavoriteChanged = (menuId: number, isFavorite: boolean) => {
+  console.log(`Menu ${menuId} favorite status changed to ${isFavorite}`)
+}
 </script>
