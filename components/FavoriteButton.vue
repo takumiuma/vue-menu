@@ -87,15 +87,20 @@ const toggleFavorite = async () => {
 
     if (isFavorite.value) {
       // 削除
-      await favoriteStore.removeFromFavorites(favoriteId.value!, token)
+      const currentFavoriteId = favoriteId.value
+      if (!currentFavoriteId) {
+        showError('お気に入りIDが見つかりません')
+        return
+      }
+      await favoriteStore.removeFromFavorites(currentFavoriteId, token)
       showSuccess('お気に入りから削除しました')
+      emit('favoriteChanged', false)
     } else {
       // 追加
       await favoriteStore.addToFavorites(props.menuId, token)
       showSuccess('お気に入りに追加しました')
+      emit('favoriteChanged', true)
     }
-
-    emit('favoriteChanged', !isFavorite.value)
   } catch (error) {
     handleError(error)
   } finally {
