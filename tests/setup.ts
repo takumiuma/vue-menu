@@ -38,6 +38,25 @@ globalThis.useRuntimeConfig = vi.fn(() => ({
 }))
 // @ts-expect-error Overriding Nuxt auto-imports for testing
 globalThis.useHead = vi.fn()
+// @ts-expect-error Overriding Nuxt auto-imports for testing
+globalThis.useRouter = vi.fn(() => ({
+  push: vi.fn(),
+  replace: vi.fn(),
+  back: vi.fn(),
+  forward: vi.fn(),
+  go: vi.fn(),
+  currentRoute: { value: { path: '/', query: {}, params: {} } },
+}))
+// @ts-expect-error Overriding Nuxt auto-imports for testing
+globalThis.storeToRefs = vi.fn((store) => {
+  const refs: Record<string, any> = {}
+  for (const key in store) {
+    if (typeof store[key] !== 'function') {
+      refs[key] = store[key]
+    }
+  }
+  return refs
+})
 
 // Mock console to reduce noise in tests
 global.console = {

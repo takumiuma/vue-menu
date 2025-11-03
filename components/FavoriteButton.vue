@@ -12,6 +12,8 @@
 import type { Auth0Client } from '@auth0/auth0-spa-js'
 import { createAuth0Client } from '@auth0/auth0-spa-js'
 import { useFavoriteStore } from '~/store/favorite'
+import { useNotification } from '~/composables/useNotification'
+import { useErrorHandler } from '~/composables/useErrorHandler'
 
 interface Props {
   menuId: number
@@ -27,6 +29,8 @@ const emit = defineEmits<Emits>()
 
 const favoriteStore = useFavoriteStore()
 const config = useRuntimeConfig()
+const { showSuccess, showError } = useNotification()
+const { handleError } = useErrorHandler()
 
 // Auth0クライアントの初期化
 const auth0 = ref<Auth0Client | null>(null)
@@ -48,7 +52,7 @@ onMounted(async () => {
         await favoriteStore.loadFavorites(token)
       }
     } catch (error) {
-      console.error('Failed to load favorites:', error)
+      await handleError(error, 'お気に入りリストの取得に失敗しました')
     }
   }
 })
@@ -102,30 +106,13 @@ const toggleFavorite = async () => {
       emit('favoriteChanged', true)
     }
   } catch (error) {
-    handleError(error)
+    const isFav = isFavorite.value
+    await handleError(
+      error,
+      isFav ? 'お気に入りの削除に失敗しました' : 'お気に入りの追加に失敗しました'
+    )
   } finally {
     loading.value = false
   }
-}
-
-const handleError = (error: unknown) => {
-  const err = error as { response?: { status?: number } }
-  if (err.response?.status === 401) {
-    showError('ログインが必要です')
-  } else if (err.response?.status === 409) {
-    showError('既にお気に入りに追加されています')
-  } else {
-    showError('操作に失敗しました')
-  }
-}
-
-const showSuccess = (message: string) => {
-  // NuxtのshowErrorは使えるが、successメッセージ用の標準機能はないため、
-  // console.logで対応（実際の実装ではVuetifyのsnackbarなどを使用することが多い）
-  console.log('Success:', message)
-}
-
-const showError = (message: string) => {
-  console.error('Error:', message)
 }
 </script>
