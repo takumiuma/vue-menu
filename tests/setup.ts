@@ -49,7 +49,7 @@ globalThis.useRouter = vi.fn(() => ({
 }))
 // @ts-expect-error Overriding Nuxt auto-imports for testing
 globalThis.storeToRefs = vi.fn((store) => {
-  const refs: Record<string, any> = {}
+  const refs: Record<string, unknown> = {}
   for (const key in store) {
     if (typeof store[key] !== 'function') {
       refs[key] = store[key]

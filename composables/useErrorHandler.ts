@@ -1,6 +1,6 @@
 import { useNotification } from './useNotification'
 
-interface ErrorResponse {
+export interface ErrorResponse {
   response?: {
     status?: number
   }
@@ -12,8 +12,8 @@ export const useErrorHandler = () => {
 
   const handleAuthError = async (error: ErrorResponse) => {
     if (error.response?.status === 401) {
-      await router.push('/login')
       showError('ログインが必要です')
+      await router.push('/login')
     }
   }
 

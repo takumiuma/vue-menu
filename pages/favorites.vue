@@ -43,13 +43,7 @@ import type { Auth0Client } from '@auth0/auth0-spa-js'
 import { createAuth0Client } from '@auth0/auth0-spa-js'
 import { useFavoriteStore } from '~/store/favorite'
 import { useNotification } from '~/composables/useNotification'
-import { useErrorHandler } from '~/composables/useErrorHandler'
-
-interface ErrorResponse {
-  response?: {
-    status?: number
-  }
-}
+import { useErrorHandler, type ErrorResponse } from '~/composables/useErrorHandler'
 
 // Set page title for SEO
 useHead({
