@@ -43,7 +43,7 @@ import type { Auth0Client } from '@auth0/auth0-spa-js'
 import { createAuth0Client } from '@auth0/auth0-spa-js'
 import { useFavoriteStore } from '~/store/favorite'
 import { useNotification } from '~/composables/useNotification'
-import { useErrorHandler, type ErrorResponse } from '~/composables/useErrorHandler'
+import { useErrorHandler } from '~/composables/useErrorHandler'
 
 // Set page title for SEO
 useHead({
@@ -109,11 +109,7 @@ const loadFavorites = async () => {
     }
     await favoriteStore.loadFavorites(token)
   } catch (error) {
-    if ((error as ErrorResponse).response?.status === 401) {
-      await router.push('/login')
-    } else {
-      await handleError(error, 'お気に入りリストの取得に失敗しました')
-    }
+    await handleError(error, 'お気に入りリストの取得に失敗しました')
   } finally {
     loading.value = false
   }

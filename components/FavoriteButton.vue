@@ -82,6 +82,7 @@ const toggleFavorite = async () => {
   }
 
   loading.value = true
+  const wasFavorite = isFavorite.value // 操作前の状態を記録
   try {
     const token = await getAccessToken()
     if (!token) {
@@ -89,7 +90,7 @@ const toggleFavorite = async () => {
       return
     }
 
-    if (isFavorite.value) {
+    if (wasFavorite) {
       // 削除
       const currentFavoriteId = favoriteId.value
       if (!currentFavoriteId) {
@@ -106,10 +107,9 @@ const toggleFavorite = async () => {
       emit('favoriteChanged', true)
     }
   } catch (error) {
-    const isFav = isFavorite.value
     await handleError(
       error,
-      isFav ? 'お気に入りの削除に失敗しました' : 'お気に入りの追加に失敗しました'
+      wasFavorite ? 'お気に入りの削除に失敗しました' : 'お気に入りの追加に失敗しました'
     )
   } finally {
     loading.value = false
