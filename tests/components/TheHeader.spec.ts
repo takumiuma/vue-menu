@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 import TheHeader from '~/components/TheHeader.vue'
 
 // Routerのモック
@@ -123,7 +123,7 @@ describe('TheHeader', () => {
     })
 
     // onBeforeMountが実行されるまで待つ
-    await new Promise((resolve) => setTimeout(resolve, 100))
+    await flushPromises()
 
     // isAuthenticatedがtrueの場合のfilteredItemsをチェック
     const vm = wrapper.vm as unknown as { filteredItems: Array<{ title: string }> }
@@ -133,7 +133,18 @@ describe('TheHeader', () => {
     expect(vm.filteredItems[2].title).toBe('お気に入り')
   })
 
-  it('お気に入りリンクのアイコンがmdi-heartである', () => {
+  it('お気に入りリンクのアイコンがmdi-heartである', async () => {
+    const mockAuth0Client = {
+      isAuthenticated: vi.fn(() => Promise.resolve(true)),
+      getUser: vi.fn(() => Promise.resolve({ sub: 'user123' })),
+      handleRedirectCallback: vi.fn(() => Promise.resolve()),
+      loginWithRedirect: vi.fn(),
+      logout: vi.fn(),
+    }
+
+    const { createAuth0Client } = await import('@auth0/auth0-spa-js')
+    vi.mocked(createAuth0Client).mockResolvedValue(mockAuth0Client as never)
+
     const wrapper = mount(TheHeader, {
       global: {
         stubs: {
@@ -156,14 +167,12 @@ describe('TheHeader', () => {
       },
     })
 
-    // ITEMS配列を直接チェック
-    const items = [
-      { title: 'ホーム', icon: 'mdi-food', link: '/' },
-      { title: 'メニューリスト', icon: 'mdi-table-edit', link: '/menuList' },
-      { title: 'お気に入り', icon: 'mdi-heart', link: '/favorites', authRequired: true },
-    ]
+    // onBeforeMountが実行されるまで待つ
+    await flushPromises()
 
-    const favoriteItem = items.find((item) => item.title === 'お気に入り')
+    // 認証済みユーザーのfilteredItemsからお気に入りアイテムをチェック
+    const vm = wrapper.vm as unknown as { filteredItems: Array<{ title: string; icon: string; link: string }> }
+    const favoriteItem = vm.filteredItems.find((item) => item.title === 'お気に入り')
     expect(favoriteItem).toBeDefined()
     expect(favoriteItem?.icon).toBe('mdi-heart')
     expect(favoriteItem?.link).toBe('/favorites')
