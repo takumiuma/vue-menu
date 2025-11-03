@@ -119,7 +119,13 @@
         </template>
         <template #item.action="{ item }">
           <v-icon class="mr-2" @click="editMenu(item)"> mdi-pencil </v-icon>
-          <v-icon @click="deleteMenu(item.id)"> mdi-delete </v-icon>
+          <v-icon class="mr-2" @click="deleteMenu(item.id)"> mdi-delete </v-icon>
+          <FavoriteButton
+            v-if="isAuthenticated"
+            :menu-id="item.id"
+            size="small"
+            @favorite-changed="onFavoriteChanged"
+          />
         </template>
       </v-data-table>
     </v-container>
@@ -153,12 +159,20 @@
 </template>
 
 <script setup lang="ts">
+import type { Auth0Client } from '@auth0/auth0-spa-js'
+import { createAuth0Client } from '@auth0/auth0-spa-js'
 import type { menu } from '~/store/menu'
 import { useMenuService, type MenuInfo } from '~/composables/useMenuService'
 import { useLoadingOverlayStore } from '~/composables/useLoadingOverlayService'
+import FavoriteButton from '~/components/FavoriteButton.vue'
 import pkg from 'lodash'
 
 const { cloneDeep } = pkg
+const config = useRuntimeConfig()
+
+// Auth0認証状態の取得
+const auth0 = ref<Auth0Client | null>(null)
+const isAuthenticated = ref(false)
 
 // Set page title for SEO and testing
 useHead({
@@ -381,10 +395,26 @@ const deleteMenu = async (menuId: number) => {
 onMounted(async () => {
   useLoadingOverlayStore().startLoading()
   loading.value = true
+  
+  // Auth0クライアントの初期化と認証状態の取得
+  auth0.value = await createAuth0Client({
+    domain: config.public.AUTH0_DOMAIN as string,
+    clientId: config.public.AUTH0_CLIENT_ID as string,
+  })
+  isAuthenticated.value = await auth0.value.isAuthenticated()
+  
   await useMenuService().getMenuInfoList()
   // メニューリストを表示用にコピー。元データは保持。
   displayedMenu.value = cloneDeep(menuList.value)
   useLoadingOverlayStore().endLoading()
   loading.value = false
 })
+
+const onFavoriteChanged = (isFavorite: boolean) => {
+  // お気に入り状態が変更されたときの処理
+  // 将来的には、メニュー表示の更新やUI反映などを実装予定
+  if (process.env.NODE_ENV === 'development') {
+    console.info('Favorite status changed:', isFavorite)
+  }
+}
 </script>
