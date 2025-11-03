@@ -11,7 +11,7 @@
     temporary
   >
     <v-list>
-      <v-list-item v-for="item in ITEMS" :key="item.title" :to="item.link">
+      <v-list-item v-for="item in filteredItems" :key="item.title" :to="item.link">
         <v-icon>{{ item.icon }}</v-icon>
         {{ item.title }}
       </v-list-item>
@@ -41,6 +41,7 @@ const TITLE = 'MenuApp'
 const ITEMS = [
   { title: 'ホーム', icon: 'mdi-food', link: '/' },
   { title: 'メニューリスト', icon: 'mdi-table-edit', link: '/menuList' },
+  { title: 'お気に入り', icon: 'mdi-heart', link: '/favorites', authRequired: true },
 ]
 const router = useRouter()
 const config = useRuntimeConfig()
@@ -49,6 +50,15 @@ const drawer = ref(false)
 const auth0 = ref<Auth0Client | null>(null)
 const isAuthenticated = ref(false)
 const prepared = ref(false)
+
+const filteredItems = computed(() => {
+  return ITEMS.filter((item) => {
+    if (item.authRequired) {
+      return isAuthenticated.value
+    }
+    return true
+  })
+})
 
 onBeforeMount(async () => {
   auth0.value = await createAuth0Client({

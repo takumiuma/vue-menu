@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import { defineStore } from 'pinia'
-import { ref, computed, readonly, onMounted, watch } from 'vue'
+import { ref, computed, readonly, onMounted, onBeforeMount, watch } from 'vue'
 
 // Mock Nuxt composables and runtime
 // @ts-expect-error Overriding Nuxt auto-imports for testing
@@ -25,6 +25,8 @@ globalThis.computed = computed
 globalThis.readonly = readonly
 // @ts-expect-error Overriding Nuxt auto-imports for testing
 globalThis.onMounted = onMounted
+// @ts-expect-error Overriding Nuxt auto-imports for testing
+globalThis.onBeforeMount = onBeforeMount
 // @ts-expect-error Overriding Nuxt auto-imports for testing
 globalThis.watch = watch
 // @ts-expect-error Overriding Nuxt auto-imports for testing
