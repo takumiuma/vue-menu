@@ -111,7 +111,7 @@ const loadFavorites = async () => {
 }
 
 // ジャンル名を取得
-const getGenreNames = (genreIds: number[]): string => {
+const getGenreNames = (genreIds: readonly number[]): string => {
   return genreIds
     .map((id) => GENRES.find((genre) => genre.id === id)?.name)
     .filter((name): name is string => name !== undefined)
@@ -119,7 +119,7 @@ const getGenreNames = (genreIds: number[]): string => {
 }
 
 // カテゴリ名を取得
-const getCategoryNames = (categoryIds: number[]): string => {
+const getCategoryNames = (categoryIds: readonly number[]): string => {
   return categoryIds
     .map((id) => CATEGORIES.find((category) => category.id === id)?.name)
     .filter((name): name is string => name !== undefined)
