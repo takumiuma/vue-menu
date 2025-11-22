@@ -345,6 +345,8 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [build, e2e-tests, codeql]
     if: always() && needs.build.result == 'success'
+    permissions:
+      actions: write
 
     steps:
       - name: Delete build artifacts
