@@ -216,9 +216,19 @@ jobs:
       - name: Build application
         run: yarn build
 
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: .output/
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 1
+
   e2e-tests:
     name: Playwright E2E Tests
     runs-on: ubuntu-24.04
+    needs: build
 
     steps:
       - name: Checkout code
@@ -253,8 +263,11 @@ jobs:
             fi
           done
 
-      - name: Build application
-        run: yarn build
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: .output/
 
       - name: Install Playwright browsers
         run: yarn test:e2e:install
@@ -276,6 +289,7 @@ jobs:
   codeql:
     name: CodeQL Security Analysis
     runs-on: ubuntu-24.04
+    needs: build
     permissions:
       actions: read
       contents: read
@@ -319,8 +333,26 @@ jobs:
             fi
           done
 
-      - name: Build for analysis
-        run: yarn build
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: .output/
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
+
+  cleanup:
+    name: Cleanup Artifacts
+    runs-on: ubuntu-24.04
+    needs: [build, e2e-tests, codeql]
+    if: always() && needs.build.result == 'success'
+    permissions:
+      actions: write
+
+    steps:
+      - name: Delete build artifacts
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: build-output
+          failOnError: false
