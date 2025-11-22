@@ -379,9 +379,11 @@ jobs:
             exit 0
           fi
 
+          # この実行の中で指定された名前のアーティファクトIDを取得
+          # (同じrun_idの中では同じ名前のアーティファクトは1つのみ)
           ARTIFACT_ID=$(echo "$BODY" | \
             jq -r ".artifacts[] | \
-              select(.name == \"${ARTIFACT_NAME}\") | .id")
+              select(.name == \"${ARTIFACT_NAME}\") | .id" | head -n1)
 
           if [ -n "$ARTIFACT_ID" ] && [ "$ARTIFACT_ID" != "null" ]; then
             echo "Deleting artifact ${ARTIFACT_NAME} (ID: ${ARTIFACT_ID})..."
