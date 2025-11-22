@@ -363,22 +363,41 @@ jobs:
           RUN_ID="${{ github.run_id }}"
           API_URL="https://api.github.com/repos/${REPO}"
 
-          ARTIFACT_ID=$(curl -s \
+          # アーティファクト一覧を取得（エラーハンドリング付き）
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
             -H "Authorization: Bearer ${GH_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            "${API_URL}/actions/runs/${RUN_ID}/artifacts" \
-            | jq -r ".artifacts[] | \
+            "${API_URL}/actions/runs/${RUN_ID}/artifacts")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            echo "Failed to fetch artifacts (HTTP ${HTTP_CODE})"
+            echo "Skipping artifact deletion."
+            exit 0
+          fi
+
+          ARTIFACT_ID=$(echo "$BODY" | \
+            jq -r ".artifacts[] | \
               select(.name == \"${ARTIFACT_NAME}\") | .id")
 
           if [ -n "$ARTIFACT_ID" ] && [ "$ARTIFACT_ID" != "null" ]; then
             echo "Deleting artifact ${ARTIFACT_NAME} (ID: ${ARTIFACT_ID})..."
-            curl -X DELETE \
+            DELETE_CODE=$(curl -s -w "%{http_code}" -o /dev/null \
+              -X DELETE \
               -H "Authorization: Bearer ${GH_TOKEN}" \
               -H "Accept: application/vnd.github+json" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
-              "${API_URL}/actions/artifacts/${ARTIFACT_ID}"
-            echo "Artifact deleted successfully."
+              "${API_URL}/actions/artifacts/${ARTIFACT_ID}")
+
+            if [ "$DELETE_CODE" -eq 204 ]; then
+              echo "Artifact deleted successfully."
+            else
+              echo "Failed to delete artifact (HTTP ${DELETE_CODE})"
+              echo "Continuing anyway (failOnError: false)"
+            fi
           else
             echo "Artifact ${ARTIFACT_NAME} not found. Skipping deletion."
           fi
