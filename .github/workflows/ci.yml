@@ -343,8 +343,8 @@ jobs:
   cleanup:
     name: Cleanup Artifacts
     runs-on: ubuntu-24.04
-    needs: [e2e-tests, codeql]
-    if: always()
+    needs: [build, e2e-tests, codeql]
+    if: always() && needs.build.result == 'success'
 
     steps:
       - name: Delete build artifacts
