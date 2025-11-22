@@ -352,7 +352,31 @@ jobs:
 
     steps:
       - name: Delete build artifacts
-        uses: geekyeggo/delete-artifact@v5
-        with:
-          name: build-output
-          failOnError: false
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # GitHub REST APIを使用してアーティファクトを削除
+          ARTIFACT_NAME="build-output"
+
+          # アーティファクトIDを取得
+          REPO="${{ github.repository }}"
+          RUN_ID="${{ github.run_id }}"
+          API_URL="https://api.github.com/repos/${REPO}"
+
+          ARTIFACT_ID=$(curl -s \
+            -H "Authorization: token ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "${API_URL}/actions/runs/${RUN_ID}/artifacts" \
+            | jq -r ".artifacts[] | \
+              select(.name == \"${ARTIFACT_NAME}\") | .id")
+
+          if [ -n "$ARTIFACT_ID" ] && [ "$ARTIFACT_ID" != "null" ]; then
+            echo "Deleting artifact ${ARTIFACT_NAME} (ID: ${ARTIFACT_ID})..."
+            curl -X DELETE \
+              -H "Authorization: token ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "${API_URL}/actions/artifacts/${ARTIFACT_ID}"
+            echo "Artifact deleted successfully."
+          else
+            echo "Artifact ${ARTIFACT_NAME} not found. Skipping deletion."
+          fi
