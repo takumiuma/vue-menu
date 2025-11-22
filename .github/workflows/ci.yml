@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies with retry
         run: |
           # Configure yarn for better network handling
-          yarn config set network-timeout 300000
+          yarn config set network-timeout 600000
           yarn config set registry https://registry.npmjs.org/
 
           # Retry installation up to 3 times
@@ -65,7 +65,7 @@ jobs:
       - name: Install dependencies with retry
         run: |
           # Configure yarn for better network handling
-          yarn config set network-timeout 300000
+          yarn config set network-timeout 600000
           yarn config set registry https://registry.npmjs.org/
 
           # Retry installation up to 3 times
@@ -105,7 +105,7 @@ jobs:
       - name: Install dependencies with retry
         run: |
           # Configure yarn for better network handling
-          yarn config set network-timeout 300000
+          yarn config set network-timeout 600000
           yarn config set registry https://registry.npmjs.org/
 
           # Retry installation up to 3 times
@@ -145,7 +145,7 @@ jobs:
       - name: Install dependencies with retry
         run: |
           # Configure yarn for better network handling
-          yarn config set network-timeout 300000
+          yarn config set network-timeout 600000
           yarn config set registry https://registry.npmjs.org/
 
           # Retry installation up to 3 times
@@ -193,7 +193,7 @@ jobs:
       - name: Install dependencies with retry
         run: |
           # Configure yarn for better network handling
-          yarn config set network-timeout 300000
+          yarn config set network-timeout 600000
           yarn config set registry https://registry.npmjs.org/
 
           # Retry installation up to 3 times
@@ -215,6 +215,18 @@ jobs:
 
       - name: Build application
         run: yarn build
+
+      - name: Verify build output
+        run: |
+          if [ -d ".output" ]; then
+            echo "Build output directory exists"
+            ls -la .output
+          else
+            echo "ERROR: Build output directory (.output) does not exist"
+            echo "Build may have failed. Listing current directory:"
+            ls -la
+            exit 1
+          fi
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -241,7 +253,7 @@ jobs:
       - name: Install dependencies with retry
         run: |
           # Configure yarn for better network handling
-          yarn config set network-timeout 300000
+          yarn config set network-timeout 600000
           yarn config set registry https://registry.npmjs.org/
 
           # Retry installation up to 3 times
@@ -311,7 +323,7 @@ jobs:
       - name: Install dependencies with retry
         run: |
           # Configure yarn for better network handling
-          yarn config set network-timeout 300000
+          yarn config set network-timeout 600000
           yarn config set registry https://registry.npmjs.org/
 
           # Retry installation up to 3 times
