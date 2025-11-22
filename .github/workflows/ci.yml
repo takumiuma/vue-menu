@@ -352,7 +352,54 @@ jobs:
 
     steps:
       - name: Delete build artifacts
-        uses: geekyeggo/delete-artifact@v5
-        with:
-          name: build-output
-          failOnError: false
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # GitHub REST APIを使用してアーティファクトを削除
+          ARTIFACT_NAME="build-output"
+
+          # アーティファクトIDを取得
+          REPO="${{ github.repository }}"
+          RUN_ID="${{ github.run_id }}"
+          API_URL="https://api.github.com/repos/${REPO}"
+
+          # アーティファクト一覧を取得（エラーハンドリング付き）
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "${API_URL}/actions/runs/${RUN_ID}/artifacts")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            echo "Failed to fetch artifacts (HTTP ${HTTP_CODE})"
+            echo "Skipping artifact deletion."
+            exit 0
+          fi
+
+          # この実行の中で指定された名前のアーティファクトIDを取得
+          # (同じrun_idの中では同じ名前のアーティファクトは1つのみ)
+          ARTIFACT_ID=$(echo "$BODY" | \
+            jq -r ".artifacts[] | \
+              select(.name == \"${ARTIFACT_NAME}\") | .id" | head -n1)
+
+          if [ -n "$ARTIFACT_ID" ] && [ "$ARTIFACT_ID" != "null" ]; then
+            echo "Deleting artifact ${ARTIFACT_NAME} (ID: ${ARTIFACT_ID})..."
+            DELETE_CODE=$(curl -s -w "%{http_code}" -o /dev/null \
+              -X DELETE \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "${API_URL}/actions/artifacts/${ARTIFACT_ID}")
+
+            if [ "$DELETE_CODE" -eq 204 ]; then
+              echo "Artifact deleted successfully."
+            else
+              echo "Failed to delete artifact (HTTP ${DELETE_CODE})"
+              echo "Continuing anyway (failOnError: false)"
+            fi
+          else
+            echo "Artifact ${ARTIFACT_NAME} not found. Skipping deletion."
+          fi
