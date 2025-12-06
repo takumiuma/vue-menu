@@ -63,7 +63,7 @@
           <FavoriteButton
             v-if="isAuthenticated"
             :menu-id="item.id"
-            @favorite-changed="(isFavorite) => onFavoriteChanged(item.id, isFavorite)"
+            @favorite-changed="(isFavorite: boolean) => onFavoriteChanged(item.id, isFavorite)"
           />
         </template>
       </v-data-table>
@@ -74,9 +74,9 @@
 <script setup lang="ts">
 import type { Auth0Client } from '@auth0/auth0-spa-js'
 import { createAuth0Client } from '@auth0/auth0-spa-js'
-import { useMenuService, type MenuInfo } from '~/composables/useMenuService'
-import { useLoadingOverlayStore } from '~/composables/useLoadingOverlayService'
 import { cloneDeep } from 'lodash'
+import { useLoadingOverlayStore } from '~/composables/useLoadingOverlayService'
+import { useMenuService, type MenuInfo } from '~/composables/useMenuService'
 
 // Set page title for SEO and testing
 useHead({
