@@ -55,7 +55,7 @@
     "@pinia/nuxt": "^0.5.1",
     "@types/lodash": "^4.17.13",
     "axios": "^1.11.0",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "nuxt3-vuex-module": "^1.1.0",
     "pinia": "^2.1.7",
     "vite": "7.2.6"
