@@ -16,6 +16,9 @@ export const useAuth0 = () => {
       _client = await createAuth0Client({
         domain: config.public.AUTH0_DOMAIN as string,
         clientId: config.public.AUTH0_CLIENT_ID as string,
+        authorizationParams: {
+          audience: config.public.AUTH0_AUDIENCE as string,
+        },
       })
 
       // Auth0 リダイレクトコールバックの処理（1回だけ実行）
@@ -37,7 +40,11 @@ export const useAuth0 = () => {
   const getAccessToken = async (): Promise<string | null> => {
     if (!_client) return null
     try {
-      return await _client.getTokenSilently()
+      return await _client.getTokenSilently({
+        authorizationParams: {
+          audience: config.public.AUTH0_AUDIENCE as string,
+        },
+      })
     } catch (error) {
       console.error('Failed to get access token:', error)
       return null
