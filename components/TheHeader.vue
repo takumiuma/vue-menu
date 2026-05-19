@@ -32,10 +32,6 @@
 </template>
 
 <script setup lang="ts">
-import type { Auth0Client } from '@auth0/auth0-spa-js'
-import { createAuth0Client } from '@auth0/auth0-spa-js'
-import { useRouter } from 'vue-router'
-
 const TITLE = 'MenuApp'
 
 const ITEMS = [
@@ -43,13 +39,11 @@ const ITEMS = [
   { title: 'メニューリスト', icon: 'mdi-table-edit', link: '/menuList' },
   { title: 'お気に入り', icon: 'mdi-heart', link: '/favorites', authRequired: true },
 ]
-const router = useRouter()
-const config = useRuntimeConfig()
 
 const drawer = ref(false)
-const auth0 = ref<Auth0Client | null>(null)
-const isAuthenticated = ref(false)
 const prepared = ref(false)
+
+const { isAuthenticated, init, login, logout } = useAuth0()
 
 const filteredItems = computed(() => {
   return ITEMS.filter((item) => {
@@ -61,34 +55,7 @@ const filteredItems = computed(() => {
 })
 
 onBeforeMount(async () => {
-  auth0.value = await createAuth0Client({
-    domain: config.public.AUTH0_DOMAIN as string,
-    clientId: config.public.AUTH0_CLIENT_ID as string,
-  })
-
-  if (
-    (window.location.search.includes('code=') && window.location.search.includes('state=')) ||
-    window.location.search.includes('error=')
-  ) {
-    // 認証成功しているか確認
-    await auth0.value.handleRedirectCallback()
-    router.push('/') // 暫定的にクエリパラメーターを削除
-  }
-  isAuthenticated.value = await auth0.value.isAuthenticated()
-  if (isAuthenticated.value) {
-    const user = await auth0.value?.getUser()
-    console.log(user)
-  }
+  await init()
   prepared.value = true
 })
-
-const login = async () => {
-  await auth0.value?.loginWithRedirect({
-    authorizationParams: {
-      redirect_uri: window.location.origin,
-    },
-  })
-}
-
-const logout = () => auth0.value?.logout({ logoutParams: { returnTo: window.location.origin } })
 </script>

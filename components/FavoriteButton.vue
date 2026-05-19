@@ -9,9 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Auth0Client } from '@auth0/auth0-spa-js'
-import { createAuth0Client } from '@auth0/auth0-spa-js'
-import { useFavoriteStore } from '~/store/favorite'
+import { useFavoriteStore } from '~/store/favorite';
 
 interface Props {
   menuId: number
@@ -26,19 +24,10 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const favoriteStore = useFavoriteStore()
-const config = useRuntimeConfig()
-
-// Auth0クライアントの初期化
-const auth0 = ref<Auth0Client | null>(null)
-const isAuthenticated = ref(false)
+const { isAuthenticated, init, getAccessToken } = useAuth0()
 
 onMounted(async () => {
-  auth0.value = await createAuth0Client({
-    domain: config.public.AUTH0_DOMAIN as string,
-    clientId: config.public.AUTH0_CLIENT_ID as string,
-  })
-
-  isAuthenticated.value = await auth0.value.isAuthenticated()
+  await init()
 
   // 認証済みかつお気に入り一覧が未取得の場合は取得
   if (isAuthenticated.value && favoriteStore.favorites.length === 0) {
@@ -59,17 +48,7 @@ const favoriteId = computed(() => favoriteStore.getFavoriteId(props.menuId))
 
 const loading = ref(false)
 
-// アクセストークンを取得
-const getAccessToken = async (): Promise<string | null> => {
-  if (!auth0.value) return null
-
-  try {
-    return await auth0.value.getTokenSilently()
-  } catch (error) {
-    console.error('Failed to get access token:', error)
-    return null
-  }
-}
+// アクセストークンを取得は useAuth0 の getAccessToken を使用
 
 const toggleFavorite = async () => {
   if (!isAuthenticated.value) {

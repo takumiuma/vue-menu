@@ -39,8 +39,6 @@
 </template>
 
 <script setup lang="ts">
-import type { Auth0Client } from '@auth0/auth0-spa-js'
-import { createAuth0Client } from '@auth0/auth0-spa-js'
 import { useFavoriteStore } from '~/store/favorite'
 
 // Set page title for SEO
@@ -48,12 +46,8 @@ useHead({
   title: 'Vue Menu - お気に入り',
 })
 
-const config = useRuntimeConfig()
 const favoriteStore = useFavoriteStore()
-
-// Auth0認証
-const auth0 = ref<Auth0Client | null>(null)
-const isAuthenticated = ref(false)
+const { isAuthenticated, init, getAccessToken } = useAuth0()
 
 // ローディング状態
 const loading = ref(true)
@@ -83,19 +77,7 @@ const CATEGORIES = [
 const favorites = computed(() => favoriteStore.favorites)
 
 // アクセストークンを取得
-const getAccessToken = async (): Promise<string | null> => {
-  if (!auth0.value) return null
-
-  try {
-    return await auth0.value.getTokenSilently()
-  } catch (error) {
-    console.error('Failed to get access token:', error)
-    return null
-  }
-}
-
-// お気に入りリストを取得
-const loadFavorites = async () => {
+const loadFavoritesList = async () => {
   try {
     const token = await getAccessToken()
     if (!token) {
@@ -135,22 +117,15 @@ const onFavoriteRemoved = () => {
 
 // マウント時の処理
 onMounted(async () => {
-  // Auth0クライアントの初期化
-  auth0.value = await createAuth0Client({
-    domain: config.public.AUTH0_DOMAIN as string,
-    clientId: config.public.AUTH0_CLIENT_ID as string,
-  })
+  await init()
 
-  // 認証状態の確認
-  isAuthenticated.value = await auth0.value.isAuthenticated()
-
-  // 未認証の場合はログインページにリダイレクト
+  // 未認証の場合はホームにリダイレクト
   if (!isAuthenticated.value) {
     navigateTo('/')
     return
   }
 
   // お気に入りリストを取得
-  await loadFavorites()
+  await loadFavoritesList()
 })
 </script>
