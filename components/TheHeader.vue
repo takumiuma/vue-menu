@@ -43,7 +43,8 @@ const ITEMS = [
 const drawer = ref(false)
 const prepared = ref(false)
 
-const { isAuthenticated, init, login, logout } = useAuth0()
+const { isAuthenticated, init, getUser, login, logout } = useAuth0()
+const { createOrGetUser } = useUserService()
 
 const filteredItems = computed(() => {
   return ITEMS.filter((item) => {
@@ -57,5 +58,12 @@ const filteredItems = computed(() => {
 onBeforeMount(async () => {
   await init()
   prepared.value = true
+
+  if (isAuthenticated.value) {
+    const user = await getUser()
+    if (user?.sub) {
+      await createOrGetUser(user.sub)
+    }
+  }
 })
 </script>

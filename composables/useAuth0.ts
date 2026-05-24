@@ -51,6 +51,11 @@ export const useAuth0 = () => {
     }
   }
 
+  const getUser = async (): Promise<{ sub?: string } | null> => {
+    if (!_client) return null
+    return (await _client.getUser()) ?? null
+  }
+
   const login = async () => {
     await _client?.loginWithRedirect({
       authorizationParams: {
@@ -66,6 +71,7 @@ export const useAuth0 = () => {
     isAuthenticated,
     init,
     getAccessToken,
+    getUser,
     login,
     logout,
   }
