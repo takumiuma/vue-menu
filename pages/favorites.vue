@@ -42,6 +42,8 @@
 import type { Auth0Client } from '@auth0/auth0-spa-js'
 import { createAuth0Client } from '@auth0/auth0-spa-js'
 import { useFavoriteStore } from '~/store/favorite'
+import { useNotification } from '~/composables/useNotification'
+import { useErrorHandler } from '~/composables/useErrorHandler'
 
 // Set page title for SEO
 useHead({
@@ -49,7 +51,10 @@ useHead({
 })
 
 const config = useRuntimeConfig()
+const router = useRouter()
 const favoriteStore = useFavoriteStore()
+const { showError } = useNotification()
+const { handleError } = useErrorHandler()
 
 // Auth0認証
 const auth0 = ref<Auth0Client | null>(null)
@@ -99,12 +104,12 @@ const loadFavorites = async () => {
   try {
     const token = await getAccessToken()
     if (!token) {
-      console.error('Failed to get access token')
+      showError('認証トークンの取得に失敗しました')
       return
     }
     await favoriteStore.loadFavorites(token)
   } catch (error) {
-    console.error('Failed to load favorites:', error)
+    await handleError(error, 'お気に入りリストの取得に失敗しました')
   } finally {
     loading.value = false
   }
@@ -146,7 +151,8 @@ onMounted(async () => {
 
   // 未認証の場合はログインページにリダイレクト
   if (!isAuthenticated.value) {
-    navigateTo('/')
+    await router.push('/login')
+    showError('ログインが必要です')
     return
   }
 
