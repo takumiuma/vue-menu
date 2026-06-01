@@ -41,7 +41,7 @@
     "prettier": "^3.6.2",
     "typescript": "^5.9.2",
     "vite-plugin-vuetify": "^2.0.1",
-    "vitest": "^4.0.15",
+    "vitest": "^4.1.0",
     "vue": "^3.3.8",
     "vue-eslint-parser": "^10.2.0",
     "vue-router": "^4.2.5",
