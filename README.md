@@ -10,9 +10,9 @@
 
 <img width="370" alt="スクリーンショット 2024-12-01 0 34 33" src="https://github.com/user-attachments/assets/62db64e5-5dee-42f5-8b14-3c438ab34c5a">
 
-# Nuxt 4 Minimal Starter
+# Nuxt 5 Minimal Starter
 
-Look at the [Nuxt 4 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
 ## Setup
 

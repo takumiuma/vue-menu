@@ -1,3 +1,4 @@
+import { defineStore } from 'pinia'
 import { useAxiosService } from '@/composables/useAxiosService'
 
 const { axios } = useAxiosService()
