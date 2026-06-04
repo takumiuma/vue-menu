@@ -2,7 +2,6 @@
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 
 export default defineNuxtConfig({
-  srcDir: '.',
   modules: [
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
@@ -21,6 +20,7 @@ export default defineNuxtConfig({
       AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID,
     },
   },
+  srcDir: '.',
   // ...
   build: {
     transpile: ['vuetify'],

@@ -66,8 +66,8 @@ describe('useFavoriteStore', () => {
         },
       ]
 
-      store.addLocalFavorite(mockFavorites[0])
-      store.addLocalFavorite(mockFavorites[1])
+      store.addLocalFavorite(mockFavorites[0]!)
+      store.addLocalFavorite(mockFavorites[1]!)
 
       expect(store.favoriteMenuIds.has(10)).toBe(true)
       expect(store.favoriteMenuIds.has(20)).toBe(true)
