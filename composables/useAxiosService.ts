@@ -7,7 +7,7 @@ const toCamelCase = (obj: unknown): unknown => {
   } else if (obj !== null && typeof obj === 'object' && obj.constructor === Object) {
     return Object.keys(obj).reduce(
       (result, key) => {
-        const camelCaseKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase())
+        const camelCaseKey = key.replace(/_([a-z])/g, (g) => g[1]!.toUpperCase())
         result[camelCaseKey] = toCamelCase((obj as Record<string, unknown>)[key])
         return result
       },

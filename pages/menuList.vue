@@ -277,10 +277,10 @@ const saveMenu = async () => {
     // 新規メニュー作成
 
     // 選択されたジャンルIDを取得
-    const selectedGenreChipIds = selectedGenreChips.value.map((index) => GENRES[index].id)
+    const selectedGenreChipIds = selectedGenreChips.value.map((index) => GENRES[index]!.id)
     editedItem.value.genreIds = selectedGenreChipIds
     // 選択されたカテゴリIDを取得
-    const selectedCategoryChipIds = selectedCategoryChips.value.map((index) => CATEGORIES[index].id)
+    const selectedCategoryChipIds = selectedCategoryChips.value.map((index) => CATEGORIES[index]!.id)
     editedItem.value.categoryIds = selectedCategoryChipIds
     // メニューを新規作成
     const result = await useMenuService().createMenu(editedItem.value)
@@ -295,10 +295,10 @@ const saveMenu = async () => {
     // メニューを更新
 
     // 選択されたジャンルIDを取得
-    const selectedGenreChipIds = selectedGenreChips.value.map((index) => GENRES[index].id)
+    const selectedGenreChipIds = selectedGenreChips.value.map((index) => GENRES[index]!.id)
     editedItem.value.genreIds = selectedGenreChipIds
     // 選択されたカテゴリIDを取得
-    const selectedCategoryChipIds = selectedCategoryChips.value.map((index) => CATEGORIES[index].id)
+    const selectedCategoryChipIds = selectedCategoryChips.value.map((index) => CATEGORIES[index]!.id)
     editedItem.value.categoryIds = selectedCategoryChipIds
     // メニューを更新
     const result = await useMenuService().updateMenu(editedItem.value)
@@ -347,7 +347,7 @@ const editMenu = (menu: MenuInfo) => {
 
 const updateMenuGenre = async (menuId: number) => {
   // 選択されたジャンルIDを取得
-  const selectedGenreChipIds = selectedGenreChips.value.map((index) => GENRES[index].id)
+  const selectedGenreChipIds = selectedGenreChips.value.map((index) => GENRES[index]!.id)
   // メニューのジャンルIDを更新
   const result = await useMenuService().updateMenuGenre(menuId, selectedGenreChipIds)
   // 更新に成功した場合、メニュー情報を更新
@@ -356,14 +356,14 @@ const updateMenuGenre = async (menuId: number) => {
     const displayedMenuIndex = displayedMenu.value.findIndex((menu) => menu.id === result.menuId)
     if (displayedMenuIndex !== -1) {
       // filteredMenuはシャローコピーなので、displayedMenuの要素を更新すると同時にfilteredMenuも更新される
-      displayedMenu.value[displayedMenuIndex].genreIds = result.genreIds
+      displayedMenu.value[displayedMenuIndex]!.genreIds = result.genreIds
     }
   }
 }
 
 const updateMenuCategory = async (menuId: number) => {
   // 選択されたカテゴリIDを取得
-  const selectedCategoryChipIds = selectedCategoryChips.value.map((index) => CATEGORIES[index].id)
+  const selectedCategoryChipIds = selectedCategoryChips.value.map((index) => CATEGORIES[index]!.id)
   // メニューのカテゴリIDを更新
   const result = await useMenuService().updateMenuCategory(menuId, selectedCategoryChipIds)
   // 更新に成功した場合、メニュー情報を更新
@@ -372,7 +372,7 @@ const updateMenuCategory = async (menuId: number) => {
     const displayedMenuIndex = displayedMenu.value.findIndex((menu) => menu.id === result.menuId)
     if (displayedMenuIndex !== -1) {
       // filteredMenuはシャローコピーなので、displayedMenuの要素を更新すると同時にfilteredMenuも更新される
-      displayedMenu.value[displayedMenuIndex].categoryIds = result.categoryIds
+      displayedMenu.value[displayedMenuIndex]!.categoryIds = result.categoryIds
     }
   }
 }

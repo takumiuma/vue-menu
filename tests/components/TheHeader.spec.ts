@@ -84,8 +84,8 @@ describe('TheHeader', () => {
     // isAuthenticatedがfalseの場合のfilteredItemsをチェック
     const vm = wrapper.vm as unknown as { filteredItems: Array<{ title: string }> }
     expect(vm.filteredItems).toHaveLength(2)
-    expect(vm.filteredItems[0].title).toBe('ホーム')
-    expect(vm.filteredItems[1].title).toBe('メニューリスト')
+    expect(vm.filteredItems[0]!.title).toBe('ホーム')
+    expect(vm.filteredItems[1]!.title).toBe('メニューリスト')
   })
 
   it('認証済みの場合はお気に入りも表示される', async () => {
@@ -128,9 +128,9 @@ describe('TheHeader', () => {
     // isAuthenticatedがtrueの場合のfilteredItemsをチェック
     const vm = wrapper.vm as unknown as { filteredItems: Array<{ title: string }> }
     expect(vm.filteredItems).toHaveLength(3)
-    expect(vm.filteredItems[0].title).toBe('ホーム')
-    expect(vm.filteredItems[1].title).toBe('メニューリスト')
-    expect(vm.filteredItems[2].title).toBe('お気に入り')
+    expect(vm.filteredItems[0]!.title).toBe('ホーム')
+    expect(vm.filteredItems[1]!.title).toBe('メニューリスト')
+    expect(vm.filteredItems[2]!.title).toBe('お気に入り')
   })
 
   it('お気に入りリンクのアイコンがmdi-heartである', async () => {
