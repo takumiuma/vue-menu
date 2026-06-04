@@ -1,3 +1,4 @@
+import { defineStore } from 'pinia'
 import { useFavoriteService } from '~/composables/useFavoriteService'
 import { useMenuStore } from '~/store/menu'
 

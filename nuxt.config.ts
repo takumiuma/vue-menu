@@ -3,8 +3,8 @@ import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 
 export default defineNuxtConfig({
   modules: [
-    '@pinia/nuxt',
-    'pinia-plugin-persistedstate/nuxt',
+    // @pinia/nuxt は Nuxt 5 未対応のため plugins/pinia.ts で手動セットアップ
+    // 'pinia-plugin-persistedstate/nuxt' は @pinia/nuxt 依存のため無効
     // 'nuxt3-vuex-module',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
@@ -21,7 +21,6 @@ export default defineNuxtConfig({
     },
   },
   srcDir: '.',
-  // ...
   build: {
     transpile: ['vuetify'],
   },

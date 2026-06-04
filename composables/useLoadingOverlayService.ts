@@ -1,3 +1,5 @@
+import { defineStore } from 'pinia'
+
 const overlay = ref<boolean>(false)
 
 const startLoading = () => {
