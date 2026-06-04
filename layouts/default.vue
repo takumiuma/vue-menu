@@ -10,6 +10,7 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { useLoadingOverlayStore } from '~/composables/useLoadingOverlayService'
 
 const overStore = useLoadingOverlayStore()
