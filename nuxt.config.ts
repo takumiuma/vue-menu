@@ -2,9 +2,10 @@
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 
 export default defineNuxtConfig({
+  srcDir: '.',
   modules: [
     '@pinia/nuxt',
-    '@pinia-plugin-persistedstate/nuxt',
+    'pinia-plugin-persistedstate/nuxt',
     // 'nuxt3-vuex-module',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
