@@ -11,13 +11,13 @@
     temporary
   >
     <v-list>
-      <v-list-item v-for="item in ITEMS" :key="item.title" :to="item.link">
+      <v-list-item v-for="item in filteredItems" :key="item.title" :to="item.link">
         <v-icon>{{ item.icon }}</v-icon>
         {{ item.title }}
       </v-list-item>
     </v-list>
     <template #append>
-      <div v-if="prepared" class="pa-2">
+      <div v-if="!isPreviewMode && prepared" class="pa-2">
         <v-btn v-if="!isAuthenticated" block @click="login">
           <v-icon>{{ 'mdi-login' }}</v-icon>
           Login
@@ -41,16 +41,39 @@ const TITLE = 'MenuApp'
 const ITEMS = [
   { title: 'ホーム', icon: 'mdi-food', link: '/' },
   { title: 'メニューリスト', icon: 'mdi-table-edit', link: '/menuList' },
+  { title: 'お気に入り', icon: 'mdi-heart', link: '/favorites', authRequired: true },
 ]
 const router = useRouter()
 const config = useRuntimeConfig()
+const isPreviewMode = !config.public.AUTH0_DOMAIN || !config.public.AUTH0_CLIENT_ID
+
+const appBaseUrl = computed(() => {
+  if (import.meta.client) {
+    return new URL(config.app.baseURL, window.location.origin).toString()
+  }
+  return config.app.baseURL
+})
 
 const drawer = ref(false)
 const auth0 = ref<Auth0Client | null>(null)
 const isAuthenticated = ref(false)
 const prepared = ref(false)
 
+const filteredItems = computed(() => {
+  return ITEMS.filter((item) => {
+    if (item.authRequired) {
+      return isAuthenticated.value
+    }
+    return true
+  })
+})
+
 onBeforeMount(async () => {
+  if (isPreviewMode) {
+    prepared.value = true
+    return
+  }
+
   auth0.value = await createAuth0Client({
     domain: config.public.AUTH0_DOMAIN as string,
     clientId: config.public.AUTH0_CLIENT_ID as string,
@@ -75,10 +98,10 @@ onBeforeMount(async () => {
 const login = async () => {
   await auth0.value?.loginWithRedirect({
     authorizationParams: {
-      redirect_uri: window.location.origin,
+      redirect_uri: appBaseUrl.value,
     },
   })
 }
 
-const logout = () => auth0.value?.logout({ logoutParams: { returnTo: window.location.origin } })
+const logout = () => auth0.value?.logout({ logoutParams: { returnTo: appBaseUrl.value } })
 </script>

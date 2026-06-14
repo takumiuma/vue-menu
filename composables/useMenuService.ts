@@ -60,7 +60,7 @@ const updateMenuGenre = async (menuId: number, genreIds: number[]): Promise<menu
   if (Object.keys(resultMenu).length > 0) {
     const index = menuList.value.findIndex((menu) => menu.id === resultMenu.menuId)
     if (index !== -1) {
-      menuList.value[index].genreIds = resultMenu.genreIds
+      menuList.value[index]!.genreIds = resultMenu.genreIds
     }
   }
   return resultMenu
@@ -74,7 +74,7 @@ const updateMenuCategory = async (menuId: number, categoryIds: number[]): Promis
   if (Object.keys(resultMenu).length > 0) {
     const index = menuList.value.findIndex((menu) => menu.id === resultMenu.menuId)
     if (index !== -1) {
-      menuList.value[index].categoryIds = resultMenu.categoryIds
+      menuList.value[index]!.categoryIds = resultMenu.categoryIds
     }
   }
   return resultMenu

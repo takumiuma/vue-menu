@@ -4,7 +4,7 @@ import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 export default defineNuxtConfig({
   modules: [
     '@pinia/nuxt',
-    '@pinia-plugin-persistedstate/nuxt',
+    'pinia-plugin-persistedstate/nuxt',
     // 'nuxt3-vuex-module',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
@@ -14,15 +14,22 @@ export default defineNuxtConfig({
     },
   ],
   devtools: { enabled: true },
+  app: {
+    baseURL: process.env.NUXT_APP_BASE_URL || '/',
+  },
   runtimeConfig: {
     public: {
       AUTH0_DOMAIN: process.env.AUTH0_DOMAIN,
       AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID,
     },
   },
+  srcDir: '.',
   // ...
   build: {
     transpile: ['vuetify'],
+  },
+  nitro: {
+    preset: 'github_pages',
   },
   vite: {
     vue: {
