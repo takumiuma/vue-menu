@@ -14,6 +14,9 @@ export default defineNuxtConfig({
     },
   ],
   devtools: { enabled: true },
+  app: {
+    baseURL: process.env.NUXT_APP_BASE_URL || '/',
+  },
   runtimeConfig: {
     public: {
       AUTH0_DOMAIN: process.env.AUTH0_DOMAIN,
@@ -24,6 +27,9 @@ export default defineNuxtConfig({
   // ...
   build: {
     transpile: ['vuetify'],
+  },
+  nitro: {
+    preset: 'github_pages',
   },
   vite: {
     vue: {
