@@ -7,7 +7,7 @@ Nuxt + Vuetify で構築したメニュー管理アプリです。
 GitHub Pages利用し、一部機能制限して公開しています。
 以下リンクからアクセスできます。
 
-- `https://<GitHubユーザーまたはOrganization>.github.io/vue-menu/menuList`
+- `https://takumiuma.github.io/vue-menu/menuList`
 
 ## 自動デプロイについて
 GitHub Actionsで`.github/workflows/deploy-pages.yml` が `master` への push を契機に `yarn generate` を実行し、`.output/public` を GitHub Pagesへデプロイします。
