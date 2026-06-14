@@ -121,7 +121,7 @@
           <v-icon class="mr-2" @click="editMenu(item)"> mdi-pencil </v-icon>
           <v-icon class="mr-2" @click="deleteMenu(item.id)"> mdi-delete </v-icon>
           <FavoriteButton
-            v-if="isAuthenticated"
+            v-if="!isPreviewMode && isAuthenticated"
             :menu-id="item.id"
             size="small"
             @favorite-changed="onFavoriteChanged"
@@ -161,14 +161,15 @@
 <script setup lang="ts">
 import type { Auth0Client } from '@auth0/auth0-spa-js'
 import { createAuth0Client } from '@auth0/auth0-spa-js'
-import type { menu } from '~/store/menu'
-import { useMenuService, type MenuInfo } from '~/composables/useMenuService'
-import { useLoadingOverlayStore } from '~/composables/useLoadingOverlayService'
-import FavoriteButton from '~/components/FavoriteButton.vue'
 import pkg from 'lodash'
+import FavoriteButton from '~/components/FavoriteButton.vue'
+import { useLoadingOverlayStore } from '~/composables/useLoadingOverlayService'
+import { useMenuService, type MenuInfo } from '~/composables/useMenuService'
+import type { menu } from '~/store/menu'
 
 const { cloneDeep } = pkg
 const config = useRuntimeConfig()
+const isPreviewMode = !config.public.AUTH0_DOMAIN || !config.public.AUTH0_CLIENT_ID
 
 // Auth0認証状態の取得
 const auth0 = ref<Auth0Client | null>(null)
@@ -395,14 +396,16 @@ const deleteMenu = async (menuId: number) => {
 onMounted(async () => {
   useLoadingOverlayStore().startLoading()
   loading.value = true
-  
+
   // Auth0クライアントの初期化と認証状態の取得
-  auth0.value = await createAuth0Client({
-    domain: config.public.AUTH0_DOMAIN as string,
-    clientId: config.public.AUTH0_CLIENT_ID as string,
-  })
-  isAuthenticated.value = await auth0.value.isAuthenticated()
-  
+  if (!isPreviewMode) {
+    auth0.value = await createAuth0Client({
+      domain: config.public.AUTH0_DOMAIN as string,
+      clientId: config.public.AUTH0_CLIENT_ID as string,
+    })
+    isAuthenticated.value = await auth0.value.isAuthenticated()
+  }
+
   await useMenuService().getMenuInfoList()
   // メニューリストを表示用にコピー。元データは保持。
   displayedMenu.value = cloneDeep(menuList.value)

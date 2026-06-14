@@ -135,6 +135,12 @@ const onFavoriteRemoved = () => {
 
 // マウント時の処理
 onMounted(async () => {
+  // プレビューモード（Auth0未設定）の場合はホームにリダイレクト
+  if (!config.public.AUTH0_DOMAIN || !config.public.AUTH0_CLIENT_ID) {
+    navigateTo('/')
+    return
+  }
+
   // Auth0クライアントの初期化
   auth0.value = await createAuth0Client({
     domain: config.public.AUTH0_DOMAIN as string,

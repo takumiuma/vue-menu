@@ -27,12 +27,15 @@ const emit = defineEmits<Emits>()
 
 const favoriteStore = useFavoriteStore()
 const config = useRuntimeConfig()
+const isPreviewMode = !config.public.AUTH0_DOMAIN || !config.public.AUTH0_CLIENT_ID
 
 // Auth0クライアントの初期化
 const auth0 = ref<Auth0Client | null>(null)
 const isAuthenticated = ref(false)
 
 onMounted(async () => {
+  if (isPreviewMode) return
+
   auth0.value = await createAuth0Client({
     domain: config.public.AUTH0_DOMAIN as string,
     clientId: config.public.AUTH0_CLIENT_ID as string,
