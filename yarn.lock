@@ -7528,7 +7528,7 @@ vite-plugin-vuetify@^2.0.1:
     debug "^4.3.3"
     upath "^2.0.1"
 
-vite@7.3.5, vite@^7.3.1, vite@^7.3.3:
+"vite@^6.0.0 || ^7.0.0 || ^8.0.0", vite@7.3.5, vite@^7.3.1, vite@^7.3.3:
   version "7.3.5"
   resolved "https://registry.yarnpkg.com/vite/-/vite-7.3.5.tgz#90c2d0b7b94a224e7e7dcf22d2912ff0b5291165"
   integrity sha512-KuOaNhcnGFN2zIPGA7wRmzF+lJA1sea7rHq17aiJ++9lzY1WWG6Jpwqwe1KNbRVPIqHmr8GLYx7jbrQcN/7/ww==
@@ -7539,19 +7539,6 @@ vite@7.3.5, vite@^7.3.1, vite@^7.3.3:
     postcss "^8.5.6"
     rollup "^4.43.0"
     tinyglobby "^0.2.15"
-  optionalDependencies:
-    fsevents "~2.3.3"
-
-"vite@^6.0.0 || ^7.0.0 || ^8.0.0":
-  version "8.0.16"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-8.0.16.tgz#ae073866c06563d6634a90169a496e11bd84f1a6"
-  integrity sha512-h9bXPmJichP5fLmVQo3PyaGSDE2n3aPuomeAlVRm0JLmt4rY6zmPKd59HYI4LNW8oTK7tlTsuC7l/m7awx9Jcw==
-  dependencies:
-    lightningcss "^1.32.0"
-    picomatch "^4.0.4"
-    postcss "^8.5.15"
-    rolldown "1.0.3"
-    tinyglobby "^0.2.17"
   optionalDependencies:
     fsevents "~2.3.3"
 
