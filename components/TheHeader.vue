@@ -7,7 +7,7 @@
   </v-app-bar>
   <v-navigation-drawer
     v-model="drawer"
-    :location="$vuetify.display.mobile ? 'top' : undefined"
+    :location="mobile ? 'top' : undefined"
     temporary
   >
     <v-list>
@@ -32,11 +32,13 @@
 </template>
 
 <script setup lang="ts">
+import { useDisplay } from 'vuetify'
 import type { Auth0Client } from '@auth0/auth0-spa-js'
 import { createAuth0Client } from '@auth0/auth0-spa-js'
 import { useRouter } from 'vue-router'
 
 const TITLE = 'MenuApp'
+const { mobile } = useDisplay()
 
 const ITEMS = [
   { title: 'ホーム', icon: 'mdi-food', link: '/' },
