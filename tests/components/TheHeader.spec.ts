@@ -14,6 +14,13 @@ vi.mock('vue-router', () => ({
   useRouter: () => mockRouter,
 }))
 
+// Vuetifyのモック
+vi.mock('vuetify', () => ({
+  useDisplay: () => ({
+    mobile: false,
+  }),
+}))
+
 // Auth0のモック
 vi.mock('@auth0/auth0-spa-js', () => ({
   createAuth0Client: vi.fn(() =>
