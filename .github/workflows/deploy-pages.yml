@@ -29,14 +29,14 @@ jobs:
           node-version: '22'
           cache: 'yarn'
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Install dependencies with retry
         run: |
-          yarn config set network-timeout 300000
-          yarn config set registry https://registry.npmjs.org/
-
           for i in {1..3}; do
             echo "Installation attempt $i..."
-            if yarn install --frozen-lockfile; then
+            if yarn install --immutable; then
               echo "Installation successful on attempt $i"
               break
             else
