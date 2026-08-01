@@ -163,9 +163,10 @@ jobs:
 
       - name: Run yarn audit (Critical only)
         run: |
-          yarn npm audit --all --json > audit.json 2>&1 || true
+          yarn npm audit --all --json > audit.json 2> audit.stderr || true
+          jq -e empty audit.json > /dev/null
           # Critical が含まれているか判定（npm audit JSON 形式に対応）
-          if jq -e '.vulnerabilities | to_entries | map(select(.value.severity == "critical")) | length > 0' audit.json > /dev/null 2>&1; then
+          if jq -e '.vulnerabilities | to_entries | map(select(.value.severity == "critical")) | length > 0' audit.json > /dev/null; then
             echo "Critical vulnerabilities found!"
             exit 1
           else
