@@ -1,0 +1,89 @@
+name: Dependabot Critical PR Slack Notification
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  notify-slack-on-critical:
+    name: Notify Slack for Critical Dependabot PR
+    runs-on: ubuntu-24.04
+    if: github.actor == 'dependabot[bot]'
+
+    steps:
+      - name: Check for critical severity
+        id: check-severity
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_LABELS: ${{ toJson(github.event.pull_request.labels) }}
+        run: |
+          is_critical=false
+
+          # Check labels for "critical"
+          if echo "$PR_LABELS" | jq -e '[.[] | .name | ascii_downcase] | any(contains("critical"))' > /dev/null 2>&1; then
+            is_critical=true
+            echo "Critical label detected"
+          fi
+
+          # Check PR body for "critical" keyword (Dependabot includes severity in body)
+          if echo "$PR_BODY" | grep -qi "critical"; then
+            is_critical=true
+            echo "Critical keyword detected in PR body"
+          fi
+
+          echo "is_critical=$is_critical" >> "$GITHUB_OUTPUT"
+
+      - name: Send Slack notification
+        if: steps.check-severity.outputs.is_critical == 'true'
+        uses: slackapi/slack-github-action@v2
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": ":rotating_light: Critical脆弱性のDependabot PRが作成されました",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": ":rotating_light: Critical脆弱性 Dependabot PR通知"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*PR:*\n<${{ github.event.pull_request.html_url }}|#${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}>"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*リポジトリ:*\n<${{ github.event.repository.html_url }}|${{ github.repository }}>"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*作成者:*\n${{ github.actor }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*作成日時:*\n${{ github.event.pull_request.created_at }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "PRを確認する"
+                      },
+                      "url": "${{ github.event.pull_request.html_url }}",
+                      "style": "danger"
+                    }
+                  ]
+                }
+              ]
+            }
