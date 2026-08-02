@@ -8,33 +8,11 @@ jobs:
   notify-slack-on-critical:
     name: Notify Slack for Critical Dependabot PR
     runs-on: ubuntu-24.04
+    # このジョブはDependabotが作成したPRでのみ実行される。PRはCriticalのものに限定される。
     # if: github.actor == 'dependabot[bot]'
 
     steps:
-      - name: Check for critical severity
-        id: check-severity
-        env:
-          PR_BODY: ${{ github.event.pull_request.body }}
-          PR_LABELS: ${{ toJson(github.event.pull_request.labels) }}
-        run: |
-          is_critical=false
-
-          # Check labels for "critical"
-          if echo "$PR_LABELS" | jq -e '[.[] | .name | ascii_downcase] | any(contains("critical"))' > /dev/null 2>&1; then
-            is_critical=true
-            echo "Critical label detected"
-          fi
-
-          # Check PR body for "critical" keyword (Dependabot includes severity in body)
-          if echo "$PR_BODY" | grep -qi "critical"; then
-            is_critical=true
-            echo "Critical keyword detected in PR body"
-          fi
-
-          echo "is_critical=$is_critical" >> "$GITHUB_OUTPUT"
-
       - name: Send Slack notification
-        if: steps.check-severity.outputs.is_critical == 'true'
         uses: slackapi/slack-github-action@v2
         with:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
