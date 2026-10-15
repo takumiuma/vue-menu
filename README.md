@@ -38,3 +38,5 @@ npx serve .output/public
 yarn build
 yarn preview
 ```
+
+最終更新: 2026-08-16
