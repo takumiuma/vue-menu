@@ -39,6 +39,7 @@
             multiple
             closable-chips
           />
+
         </template>
         <template #loading>
           <v-skeleton-loader type="table-row@10" />
