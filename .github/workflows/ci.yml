@@ -220,7 +220,7 @@ jobs:
             exit "$audit_exit"
           fi
 
-          jq -e empty audit.json > /dev/null
+          jq empty audit.json > /dev/null
           # Critical が含まれているか判定（npm audit JSON 形式に対応）
           if jq -e '.vulnerabilities | to_entries | map(select(.value.severity == "critical")) | length > 0' audit.json > /dev/null; then
             echo "Critical vulnerabilities found!"
