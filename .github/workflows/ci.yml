@@ -220,9 +220,27 @@ jobs:
             exit "$audit_exit"
           fi
 
-          jq empty audit.json > /dev/null
-          # Critical が含まれているか判定（npm audit JSON 形式に対応）
-          if jq -e '.vulnerabilities | to_entries | map(select(.value.severity == "critical")) | length > 0' audit.json > /dev/null; then
+          if ! jq -s 'length >= 0' audit.json > /dev/null; then
+            echo "yarn npm audit produced invalid JSON." >&2
+            cat audit.stderr >&2
+            exit 1
+          fi
+
+          # Yarn emits JSON Lines audit advisories; npm may emit one report with vulnerabilities.
+          if jq -e -s '
+            any(
+              .[];
+              (
+                .data?.advisory?.severity? == "critical"
+                or .severity? == "critical"
+                or (
+                  (.vulnerabilities? // {})
+                  | to_entries
+                  | any(.value.severity? == "critical")
+                )
+              )
+            )
+          ' audit.json > /dev/null; then
             echo "Critical vulnerabilities found!"
             exit 1
           else

@@ -25,8 +25,8 @@
 ### 4. セキュリティ監査
 
 - 依存関係の既知の脆弱性をチェック
-- `yarn audit`を中程度のレベル閾値で使用
-- コマンド: `yarn audit`
+- `yarn npm audit --all`を実行し、Criticalの脆弱性があれば失敗
+- コマンド: `yarn npm audit --all --json`
 
 ### 5. ビルド検証
 
