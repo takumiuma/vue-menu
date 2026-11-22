@@ -17,7 +17,7 @@ concurrency:
 jobs:
   build:
     name: Build static site
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
 
     steps:
       - name: Checkout code
@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: '22'
+          node-version: ${{ vars.NODE_VERSION }}
 
       - name: Enable Corepack
         run: corepack enable
@@ -80,7 +80,7 @@ jobs:
 
   deploy:
     name: Deploy GitHub Pages artifact
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
     needs: build
     environment:
       name: github-pages

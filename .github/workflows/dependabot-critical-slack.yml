@@ -7,7 +7,7 @@ on:
 jobs:
   notify-slack-on-critical:
     name: Notify Slack for Critical Dependabot PR
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
     # このジョブはDependabotが作成したPRでのみ実行される。PRはCriticalのものに限定される。
     if: github.actor == 'dependabot[bot]'
 
