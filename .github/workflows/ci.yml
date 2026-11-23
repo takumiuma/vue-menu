@@ -10,7 +10,7 @@ on:
 jobs:
   lint:
     name: ESLint
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
 
     steps:
       - name: Checkout code
@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: '22'
+          node-version: ${{ vars.NODE_VERSION }}
 
       - name: Enable Corepack
         run: corepack enable
@@ -60,7 +60,7 @@ jobs:
 
   type-check:
     name: TypeScript Type Check
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
 
     steps:
       - name: Checkout code
@@ -69,7 +69,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: '22'
+          node-version: ${{ vars.NODE_VERSION }}
 
       - name: Enable Corepack
         run: corepack enable
@@ -110,7 +110,7 @@ jobs:
 
   unit-tests:
     name: Unit Tests (Vitest)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
 
     steps:
       - name: Checkout code
@@ -119,7 +119,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: '22'
+          node-version: ${{ vars.NODE_VERSION }}
 
       - name: Enable Corepack
         run: corepack enable
@@ -160,7 +160,7 @@ jobs:
 
   security:
     name: Security Audit
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
 
     steps:
       - name: Checkout code
@@ -169,7 +169,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: '22'
+          node-version: ${{ vars.NODE_VERSION }}
 
       - name: Enable Corepack
         run: corepack enable
@@ -249,7 +249,7 @@ jobs:
 
   build:
     name: Build
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
 
     steps:
       - name: Checkout code
@@ -258,7 +258,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: '22'
+          node-version: ${{ vars.NODE_VERSION }}
 
       - name: Enable Corepack
         run: corepack enable
@@ -308,7 +308,7 @@ jobs:
 
   e2e-tests:
     name: Playwright E2E Tests
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
     needs: build
 
     steps:
@@ -318,7 +318,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: '22'
+          node-version: ${{ vars.NODE_VERSION }}
 
       - name: Enable Corepack
         run: corepack enable
@@ -379,7 +379,7 @@ jobs:
 
   codeql:
     name: CodeQL Security Analysis
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
     needs: build
     permissions:
       actions: read
@@ -398,7 +398,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: '22'
+          node-version: ${{ vars.NODE_VERSION }}
 
       - name: Enable Corepack
         run: corepack enable
@@ -445,7 +445,7 @@ jobs:
 
   cleanup:
     name: Cleanup Artifacts
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-${{ vars.UBUNTU_VERSION }}
     needs: [build, e2e-tests, codeql]
     if: always() && needs.build.result == 'success'
     permissions:
